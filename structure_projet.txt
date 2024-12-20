@@ -1,0 +1,117 @@
+Cmv/
+├── .github/
+│   └── workflows/
+│       └── main.yml
+│
+├── caddy/
+│   └── Caddyfile
+│
+├── cmv-backend/
+│   ├── Dockerfile
+│   ├── package.json
+│   ├── tsconfig.json
+│   ├── .env
+│   ├── prisma/
+│   │   ├── schema.prisma
+│   │   ├── seed.ts
+│   │   └── migrations/
+│   │
+│   ├── src/
+│   │   ├── app.ts
+│   │   ├── fleet_service/
+│   │   │   ├── fleet-service.ts
+│   │   │   ├── router/
+│   │   │   │   └── index.ts
+│   │   │   └── service/
+│   │   │       └── index.ts
+│   │   │
+│   │   ├── it_service/
+│   │   │   ├── it-service.ts
+│   │   │   ├── router/
+│   │   │   │   └── index.ts
+│   │   │   └── service/
+│   │   │       ├── auth.ts
+│   │   │       ├── resource.ts
+│   │   │       ├── task.ts
+│   │   │       └── user.ts
+│   │   │
+│   │   ├── middlewares/
+│   │   │   ├── jwt/
+│   │   │   ├── proxy/
+│   │   │   ├── role/
+│   │   │   └── validation/
+│   │   │
+│   │   └── utils/
+│   │       ├── edge.ts
+│   │       ├── logger.ts
+│   │       ├── mailer.ts
+│   │       ├── prisma.ts
+│   │       ├── schemas/
+│   │       │   ├── auth.schema.ts
+│   │       │   ├── create-resource.schema.ts
+│   │       │   ├── create-ticket.schema.ts
+│   │       │   ├── create-user.schema.ts
+│   │       │   └── create-vehicle.schema.ts
+│   │       └── types/
+│   │           └── index.ts
+│   │
+│   ├── test/
+│   │   ├── fleet.test.ts
+│   │   ├── resource.test.ts
+│   │   ├── task.test.ts
+│   │   └── users.test.ts
+│   │
+│   └── views/
+│       └── emails/
+│           ├── client-task-approval-status.edge
+│           ├── password.edge
+│           └── task-completed-client-notification.edge
+│
+└── cmv-web/
+    ├── Dockerfile
+    ├── package.json
+    ├── vite.config.ts
+    ├── tailwind.config.js
+    ├── index.html
+    │
+    ├── public/
+    │
+    └── src/
+        ├── App.vue
+        ├── main.ts
+        ├── assets/
+        │   ├── logo.png
+        │   └── styles/
+        │       └── style.css
+        │
+        ├── components/
+        │   ├── AppSidebar.vue
+        │   ├── Combobox.vue
+        │   ├── DataTable.vue
+        │   ├── Splashscreen.vue
+        │   ├── ui/ (various UI components)
+        │   └── data-table-dropdown.vue
+        │
+        ├── lib/
+        │   └── utils.ts
+        │
+        ├── pages/
+        │   ├── auth/
+        │   ├── error/
+        │   ├── fleet/
+        │   ├── resources/
+        │   ├── tickets/
+        │   └── users/
+        │
+        ├── store/
+        │   ├── auth.ts
+        │   ├── fleet.ts
+        │   ├── resource.ts
+        │   ├── ticket.ts
+        │   ├── token.ts
+        │   └── user.ts
+        │
+        └── utils/
+            ├── functions.ts
+            ├── schemas/
+            └── types/

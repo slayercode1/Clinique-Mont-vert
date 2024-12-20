@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Statut de la tâche - Validée/Refusée</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7f7f7;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 20px auto;
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .header {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .content {
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    .task-details {
+      margin: 20px 0;
+      padding: 10px;
+      background-color: #f0f0f0;
+      border-left: 4px solid #4CAF50;
+      border-radius: 4px;
+    }
+
+    .button {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 4px;
+      font-size: 16px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    {{status}}
+    <div class="header">Statut de la tâche - {{status === "CLOSED" ? "Validé" : "Refusé"}} par le client</div>
+    <div class="content">
+      <p>Bonjour {{ resolvedBy.firstname }} {{resolvedBy.lastname }},</p>
+      <p>Le client {{employee.firstname }} {{ employee.lastname }} a {{status === "CLOSED" ? "validé" : "refusé"}} la tâche suivante :</p>
+      <div class="task-details">
+        <p><strong>Tâche n°:</strong> {{ id }}</p>
+        <p><strong>Description :</strong> {{ decription}}</p>
+        <p><strong>Date de réponse :</strong> {{ new Date()}}</p>
+      </div>
+      <p>Vous pouvez consulter les détails de la tâche en suivant ce lien :</p>
+      <p><a href="http://localhost:5173/ticket/{{ id }}" class="button">Voir la Tâche</a></p>
+    </div>
+  </div>
+</body>
+
+</html>

@@ -1,0 +1,185 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  schemas  = ["cmv-fleet", "cmv-it"]
+}
+
+model User {
+  id                String   @id @default(cuid())
+  firstname         String
+  lastname          String
+  email             String
+  password          String
+  deleted           Boolean  @default(false)
+  status            Status   @default(INACTIF)
+  role              Role     @relation(fields: [roleId], references: [id])
+  roleId            String
+  service           Service  @relation(fields: [serviceId], references: [id])
+  serviceId         String
+  session           Session?
+  ticketsAsEmployee Ticket[] @relation("EmployeeRelation")
+  ticketsAsResolver Ticket[] @relation("ResolvedByRelation")
+  Ticket            Ticket[] @relation("AssignRelation")
+
+  @@schema("cmv-it")
+}
+
+enum Status {
+  ACTIF
+  INACTIF
+
+  @@schema("cmv-it")
+}
+
+model Role {
+  id               String             @id @default(cuid())
+  name             String
+  PermissionOnRole PermissionOnRole[]
+  User             User[]
+
+  @@schema("cmv-it")
+}
+
+model Session {
+  id         String   @id @default(cuid())
+  token      String
+  expired_at DateTime
+  user       User     @relation(fields: [userid], references: [id])
+  userid     String   @unique
+
+  @@schema("cmv-it")
+}
+
+model Service {
+  id     String   @id @default(cuid())
+  name   String
+  User   User[]
+  Ticket Ticket[]
+
+  @@schema("cmv-it")
+}
+
+model Ticket {
+  id           String       @id @default(cuid())
+  status       StatusTicket @default(TODO)
+  priority     Priority     @default(HIGT)
+  created_at   DateTime     @updatedAt
+  validated_at DateTime?
+  employee     User         @relation("EmployeeRelation", fields: [employeeId], references: [id])
+  employeeId   String
+  decription   String
+  deleted      Boolean      @default(false)
+  service      Service      @relation(fields: [serviceId], references: [id])
+  serviceId    String
+  resolvedBy   User?        @relation("ResolvedByRelation", fields: [resolvedById], references: [id])
+  resolvedById String?
+  assignId     String?
+  assign       User?        @relation("AssignRelation", fields: [assignId], references: [id])
+  material     Material[]
+
+  @@schema("cmv-it")
+}
+
+enum Priority {
+  HIGT
+  MEDIUM
+  LOW
+
+  @@schema("cmv-it")
+}
+
+enum StatusTicket {
+  TODO
+  IN_PROGRESS
+  CLOSED
+  IN_VALIDATE
+  VALIDE
+  NOT_VALIDATE
+  BLOCKED
+
+  @@schema("cmv-it")
+}
+
+model Material {
+  id            String   @id @default(cuid())
+  type          String
+  resource      String
+  location      String
+  state         State    @default(IN_USE)
+  purchase_date DateTime @db.Date
+  supplier      String
+  expired_at    DateTime @db.Date
+  deleted       Boolean  @default(false)
+  ticket        Ticket?  @relation(fields: [ticketId], references: [id])
+  ticketId      String?
+
+  @@schema("cmv-it")
+}
+
+enum State {
+  IN_USE
+  IN_REPAIR
+  OUT_OF_SERVICE
+
+  @@schema("cmv-it")
+}
+
+model Permission {
+  id               String             @id @default(cuid())
+  action           String
+  resource         String
+  PermissionOnRole PermissionOnRole[]
+
+  @@unique([action, resource], name: "action_resource_unique")
+  @@schema("cmv-it")
+}
+
+model PermissionOnRole {
+  role         Role       @relation(fields: [roleId], references: [id])
+  roleId       String
+  permission   Permission @relation(fields: [permissionId], references: [id])
+  permissionId String
+
+  @@id([roleId, permissionId])
+  @@unique([roleId, permissionId])
+  @@schema("cmv-it")
+}
+
+model Vehicle {
+  id               String       @id @default(cuid())
+  brand            String
+  model            String
+  year             Int
+  state            StateVehicle @default(IN_USE)
+  maintenance_date DateTime     @db.Date
+  kilometres       String
+  deleted          Boolean      @default(false)
+  Cost             Cost[]
+
+  @@schema("cmv-fleet")
+}
+
+enum StateVehicle {
+  IN_USE
+  IN_REPAIR
+  AVAILABLE
+
+  @@schema("cmv-fleet")
+}
+
+model Cost {
+  id               String   @id @default(cuid())
+  cost             Decimal  @db.Decimal(10, 2)
+  description      String
+  deleted          Boolean  @default(false)
+  maintenance_date DateTime @db.Date
+  vehicle          Vehicle  @relation(fields: [vehicleId], references: [id])
+  vehicleId        String
+
+  @@schema("cmv-fleet")
+}

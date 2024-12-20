@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tâche terminée - En attente de validation</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7f7f7;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 20px auto;
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .header {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      color: #333;
+    }
+    .content {
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    .task-details {
+      margin: 20px 0;
+      padding: 10px;
+      background-color: #f0f0f0;
+      border-left: 4px solid #4CAF50;
+      border-radius: 4px;
+    }
+    .button {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 4px;
+      font-size: 16px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">Tâche terminée - En attente de votre validation</div>
+    <div class="content">
+      <p>Bonjour {{ employee.firstname }} {{ employee.lastname }},</p>
+      <p>Nous vous informons que la tâche suivante a été complétée et est prête pour votre validation :</p>
+      <div class="task-details">
+        <p><strong>Tâche n°:</strong> {{ id}}</p>
+        <p><strong>Description :</strong> {{ decription}}</p>
+        <p><strong>Date de réponse :</strong> {{ new Date()}}</p>
+      </div>
+      <p>Pour valider ou refuser la tâche, veuillez cliquer sur le lien ci-dessous :</p>
+      <p><a href="http://localhost:5173/ticket/{{ id }}" class="button">Valider ou Refuser la Tâche</a></p>
+      <p>Merci de bien vouloir nous faire part de votre décision afin que nous puissions finaliser cette étape.</p>
+    </div>
+  </div>
+</body>
+</html>
