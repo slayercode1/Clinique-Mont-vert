@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 import express from 'express';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
-import { proxy } from './middlewares/proxy/proxy';
+import { proxy } from './middlewares/proxy/proxy.js';
 
 dotenv.config();
 
@@ -35,7 +35,7 @@ gateway.use(express.json());
 gateway.use('/:service', proxy);
 
 if (process.env.NODE_ENV !== 'test') {
-  gateway.listen(port);
+  gateway.listen(port, '0.0.0.0');
 }
 
 export default gateway;

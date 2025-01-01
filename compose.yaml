@@ -1,0 +1,17 @@
+
+services:
+  frontend:
+    build:
+      context: ./cmv-web
+    environment:
+      NODE_ENV: production
+    ports:
+      - 5173:5173
+  server:
+    build:
+      context: ./cmv-backend
+    environment:
+      NODE_ENV: production
+    ports:
+      - 3000:3000
+
