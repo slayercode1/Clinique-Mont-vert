@@ -15,15 +15,11 @@ COPY ./package*.json ./
 # Install dependencies including dev dependencies
 RUN npm install --include=dev
 
-
 # Copy the rest of the source files into the image
 COPY . .
 
 # Generate Prisma client before switching users
 RUN npx prisma generate
-
-# Switch to non-root user
-USER node
 
 # Expose the port that the application listens on
 EXPOSE 3000

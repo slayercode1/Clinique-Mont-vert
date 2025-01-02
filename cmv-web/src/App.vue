@@ -77,23 +77,34 @@ const sidebarMenuItems = computed(() => {
   <Splashscreen v-if="showSplashscreen" @close="closeSplashscreen" />
   <SidebarProvider v-else>
     <!-- quil faut pas etre sur la  route /change-password et sur /forbidden et notfound -->
-    <div class="w-full md:flex relative"
-      v-if="isAuth.isAuthenticated && $route.path !== '/change-password' && $route.path !== '/forbidden' && $route.path !== '/notfound'">
-      <AppSidebar :menu="sidebarMenuItems" />
-      <SidebarTrigger />
-      <div class="absolute right-5 top-3">
-        <DropdownMenu>
-          <DropdownMenuTrigger>
-            <Settings />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Settings</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem @click="() => router.push('/settings')">Permission</DropdownMenuItem>
-            <DropdownMenuItem @click="() => router.push('/roles')">Rôle</DropdownMenuItem>
-            <DropdownMenuItem @click="() => router.push('/services')">Service</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+    <div class="w-full">
+      <div
+        v-if="
+          isAuth.isAuthenticated &&
+          $route.path !== '/change-password' &&
+          $route.path !== '/forbidden' &&
+          $route.path !== '/notfound'
+        "
+        class="w-full md:flex relative"
+      >
+        <AppSidebar :menu="sidebarMenuItems" />
+        <SidebarTrigger />
+        <div class="absolute right-5 top-3">
+          <DropdownMenu>
+            <DropdownMenuTrigger>
+              <Settings />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Settings</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem @click="() => router.push('/settings')"
+                >Permission</DropdownMenuItem
+              >
+              <DropdownMenuItem @click="() => router.push('/roles')">Rôle</DropdownMenuItem>
+              <DropdownMenuItem @click="() => router.push('/services')">Service</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
       <RouterView />
     </div>

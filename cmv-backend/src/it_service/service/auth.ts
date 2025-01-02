@@ -15,30 +15,38 @@ export const signIn = async (
     password: string;
   };
   try {
-
     if (!email || !p)
       return response.status(400).json({
         success: false,
         message: 'Email or password is missing',
       });
 
-    const accountExist = await prisma.user.findFirst({
-      where: {
-        email: email,
-      },
-      include: {
-        role: {
-          include: {
-            PermissionOnRole: {
-              include: {
-                role: true,
-                permission: true,
+    console.log(email);
+    console.log(p);
+
+    const accountExist = await prisma.user
+      .findFirst({
+        where: {
+          email: email,
+        },
+        include: {
+          role: {
+            include: {
+              PermissionOnRole: {
+                include: {
+                  role: true,
+                  permission: true,
+                },
               },
             },
           },
         },
-      },
-    });
+      })
+      .catch((err: any) => {
+        console.log(err);
+      });
+
+    console.log(accountExist?.status);
 
     if (!accountExist)
       return response.status(400).json({
@@ -53,6 +61,7 @@ export const signIn = async (
       });
 
     const passwordIsValid = await bcrypt.compare(p, accountExist.password);
+    console.log(passwordIsValid);
     if (!passwordIsValid)
       return response.status(400).json({
         success: false,
@@ -63,12 +72,15 @@ export const signIn = async (
 
     //create jwt
     const privateKey = process.env.JWT_SECRET_KEY as string;
+    console.log(privateKey);
     const accessToken = jwt.sign(
       {
         ...userWithoutPassword,
       },
       privateKey
     );
+
+    console.log(accessToken);
     //save in db
     await prisma.session.create({
       data: {

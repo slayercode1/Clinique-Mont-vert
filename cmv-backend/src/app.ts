@@ -8,7 +8,7 @@ import { proxy } from './middlewares/proxy/proxy.js';
 dotenv.config();
 
 const gateway = express();
-const port = 3000;
+const port = process.env.PORT_GATEWAY;
 //gateway.use(helmet());
 // gateway.use( (req, res, next) => logger(req, res, next))
 gateway.use(
@@ -35,6 +35,7 @@ gateway.use(express.json());
 gateway.use('/:service', proxy);
 
 if (process.env.NODE_ENV !== 'test') {
+  console.log(port);
   gateway.listen(port);
 }
 
