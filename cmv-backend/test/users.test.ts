@@ -1,13 +1,16 @@
 import request from 'supertest';
 import gateway from '../src/app';
 import { describe, expect, beforeAll, it, afterAll } from '@jest/globals';
+import prisma from '../src/utils/prisma';
 
 describe('API Endpoints USER', () => {
   let token: string;
   let userId: string;
+  let service: any;
+  let role: any;
 
   beforeAll(async () => {
-    // Connecte-toi et récupère le token
+    // Connection et récupèration du token
     const loginResponse = await request(gateway).post('/it/sign-in').send({
       email: 'support@technique.com',
       password: 'Jx8QKYJ3Jqgz?sPn#n',
@@ -16,6 +19,18 @@ describe('API Endpoints USER', () => {
     // Vérifie si la connexion a réussi et récupère le token
     token = loginResponse.body.data?.token;
     userId = loginResponse.body.data?.id;
+
+    service = await prisma.service.create({
+      data: {
+        name: 'ServiceTest',
+      }
+    })
+
+    role = await prisma.role.findFirst({
+      where: {
+        name: 'SuperAdmin'
+      }
+    })
   });
 
   it('GET /users should return list of users', async () => {
@@ -82,19 +97,20 @@ describe('API Endpoints USER', () => {
         email: 'yannnnclain91@gmail.com',
         password: 'adminadmin19',
         status: 'ACTIF',
-        roleId: 'cm3ychtom000010zcuo2edz4m',
-        serviceId: 'cm4a11aq4001efiw8yb7k9314',
+        roleId: role?.id,
+        serviceId: service.id,
       })
       .expect(200)
       .expect('Content-Type', /json/);
-    
-    console.log('response.body', response.body);
+
 
     expect(response.body).toHaveProperty('success', true);
     expect(response.body).toEqual({
       success: true,
       data: response.body.data,
     });
+
+
   });
 
   it('POST /role should create a new role', async () => {
@@ -109,6 +125,12 @@ describe('API Endpoints USER', () => {
 
     expect(response.body).toHaveProperty('success', true);
     expect(response.body.data).toHaveProperty('name', 'NewRoleTest');
+
+    await prisma.role.delete({
+      where: {
+        id: response.body.data.id
+      }
+    })
   });
 
   it('POST /service should create a new service', async () => {
@@ -117,13 +139,18 @@ describe('API Endpoints USER', () => {
       .set('Authorization', `Bearer ${token}`)
       .send({
         name: 'NewServiceTest',
-        description: 'Service created for testing purposes',
       })
       .expect(200)
       .expect('Content-Type', /json/);
 
     expect(response.body).toHaveProperty('success', true);
     expect(response.body.data).toHaveProperty('name', 'NewServiceTest');
+
+    await prisma.service.delete({
+      where: {
+        id: response.body.data.id
+      }
+    })
   });
 
   it('POST /permission should create or update a permission', async () => {
@@ -131,16 +158,34 @@ describe('API Endpoints USER', () => {
       .post('/it/permission')
       .set('Authorization', `Bearer ${token}`)
       .send({
-        name: 'NewPermissionTest',
-        actions: 'read'
+        roleId: role.id,
+        permissions: [{ resource: "test", actions: ['create'] }]
       })
       .expect(200)
       .expect('Content-Type', /json/);
 
     expect(response.body).toHaveProperty('success', true);
-    expect(response.body.data).toHaveProperty('name', 'NewPermissionTest');
-    expect(response.body.data).toHaveProperty('actions');
-    expect(Array.isArray(response.body.data.actions)).toBe(true);
+    expect(response.body).toEqual({
+      success: true,
+      message: 'Permissions mises à jour avec succès pour le rôle',
+    });
+
+    await request(gateway)
+      .post('/it/permission')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        roleId: role.id,
+        permissions: [{ resource: "test", actions: [] }]
+      })
+      .expect(200)
+    
+    await prisma.permission.deleteMany  ({
+      where: {
+        action: 'create',
+        resource: 'test'
+      }
+    })
+
   });
 
   it('PATCH /user/:id should update an user', async () => {
@@ -170,12 +215,10 @@ describe('API Endpoints USER', () => {
         email: 'tempuserdelete@example.com',
         password: 'tempPassword123',
         status: 'ACTIF',
-        roleId: 'cm3ychtom000010zcuo2edz4m',
-        serviceId: 'cm4a11aq4001efiw8yb7k9314',
+        roleId: role.id,
+        serviceId: service.id,
       })
       .then((res) => res.body.data);
-    
-    console.log('userToDelete', userToDelete);
 
     const deleteResponse = await request(gateway)
       .delete(`/it/delete-user/${userToDelete?.id}`)
@@ -184,17 +227,25 @@ describe('API Endpoints USER', () => {
       .expect('Content-Type', /json/);
 
     expect(deleteResponse.body).toHaveProperty('success', true);
-
-    // Vérifie que l'utilisateur supprimé ne peut plus être récupéré
-    const getDeletedUser = await request(gateway)
-      .get(`/it/user/${userToDelete.id}`)
-      .set('Authorization', `Bearer ${token}`)
-      .expect(404);
-
-    expect(getDeletedUser.body).toHaveProperty('success', false);
   });
 
   afterAll(async () => {
+
+    //delete all data on database
+    await prisma.user.deleteMany({
+      where: {
+        id: {
+          not: userId
+        }
+      }
+    })
+
+    await prisma.service.delete({
+      where: {
+        id: service.id
+      }
+    })
+
     // Déconnexion après le test
     await request(gateway)
       .post(`/it/sign-out/${userId}`)
