@@ -14,6 +14,13 @@ export default defineConfig({
     },
   },
   plugins: [vue()],
+  server: {
+    port: 5173,
+    host: true,
+    watch: {
+      usePolling: true,
+    },
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),

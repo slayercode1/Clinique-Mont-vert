@@ -1,12 +1,12 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { AutoForm } from '@/components/ui/auto-form';
-import z from 'zod';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'vue-router';
 import { authStore } from '@/store/auth';
 import { toast } from 'vue-sonner';
 import { useTokenStore } from '@/store/token.ts';
 import { ref } from 'vue';
+import { z } from 'zod';
 
 const auth = authStore();
 const token = useTokenStore();
@@ -46,9 +46,6 @@ const handleSubmit = (value: { email: string; password: string }) => {
       <h1 class="text-center text-2xl font-bold text-black sm:text-3xl">CLINIQUE MONT-VERT</h1>
 
       <AutoForm
-        class="mb-0 mt-6 space-y-4 p-4 sm:p-6 lg:p-8"
-        @submit="handleSubmit"
-        :schema="formSignInSchema"
         :field-config="{
           email: {
             label: 'Addresse e-mail',
@@ -66,8 +63,11 @@ const handleSubmit = (value: { email: string; password: string }) => {
             },
           },
         }"
+        :schema="formSignInSchema"
+        class="mb-0 mt-6 space-y-4 p-4 sm:p-6 lg:p-8"
+        @submit="handleSubmit"
       >
-        <Button type="submit" class="mt-4 w-full text-center">
+        <Button class="mt-4 w-full text-center" type="submit">
           <span v-if="isLoading" class="loaderBtn"></span>
           <span v-else> Connexion </span>
         </Button>
