@@ -7,6 +7,8 @@ services:
       NODE_ENV: development
     ports:
       - "5173:5173"
+    depends_on:
+      - server
 
   server:
     build:
@@ -19,6 +21,8 @@ services:
       - PORT_SERVICE_FLEET=3002
       - CORS_ORIGIN='http://localhost:5173'
       - JWT_SECRET_KEY="JgGoWl+JCmMMQTfZ6tvu8hqI7HQLkZ/Z9CeVRzvs9Ylv"
+    stdin_open: true  # Équivalent de -it pour garder le terminal interactif
+    tty: true         # Équivalent de -it pour garder un pseudo-terminal
     ports:
       - "3000:3000"
       - "5555:5555"
@@ -35,5 +39,25 @@ services:
     ports:
       - '5432:5432'
 
+  caddy:
+    image: caddy:2.9-alpine
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - $PWD/conf:/etc/caddy
+      - $PWD/cmv-web/dist:/srv
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - db
+      - server
+      - frontend
 volumes:
+  caddy_data:
+  caddy_config:
   postgres-data:
