@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'vue-router';
 import { toast } from 'vue-sonner';
@@ -38,7 +38,7 @@ const form = useForm({
 onBeforeMount(async () => {
   await resource.fetchResources();
   await user.fetchUsers();
-  await user.fetchServices()
+  await user.fetchServices();
 });
 
 const createTicket = form.handleSubmit((values) => {
@@ -69,7 +69,6 @@ const priorities = [
   { value: 'MEDIUM', label: 'Moyen' },
   { value: 'HIGT', label: 'Fort' },
 ];
-
 </script>
 
 <template>
@@ -78,7 +77,7 @@ const priorities = [
       <h1 class="text-2xl font-bold mb-10">Espace Information</h1>
       <p class="text-base font-bold mb-4">Ticket N° 1002</p>
       <div class="px-4 relative h-auto md:h-1/2 lg:h-1/2 w-1/2 m-auto">
-        <form @submit="createTicket" class="space-y-4">
+        <form class="space-y-4" @submit="createTicket">
           <FormField name="employeeId">
             <FormItem>
               <FormLabel>Employé</FormLabel>
@@ -92,15 +91,15 @@ const priorities = [
                     };
                   })
                 "
-                name="employeeId"
                 :setFieldValue="form.setFieldValue"
+                name="employeeId"
               />
               <FormMessage />
             </FormItem>
           </FormField>
           <FormField
-            name="assignId"
             v-if="['IT_USER', 'IT_ADMIN'].includes(auth.getUser?.role.name as string)"
+            name="assignId"
           >
             <FormItem>
               <FormLabel>Utilisateur assigner</FormLabel>
@@ -114,13 +113,13 @@ const priorities = [
                     };
                   })
                 "
-                name="assignId"
                 :setFieldValue="form.setFieldValue"
+                name="assignId"
               />
               <FormMessage />
             </FormItem>
           </FormField>
-          <FormField name="service" v-slot="{ componentField }">
+          <FormField v-slot="{ componentField }" name="serviceId">
             <FormItem>
               <FormLabel>Service</FormLabel>
               <FormControl>
@@ -144,7 +143,7 @@ const priorities = [
               <FormMessage />
             </FormItem>
           </FormField>
-          <FormField name="priority" v-slot="{ componentField }">
+          <FormField v-slot="{ componentField }" name="priority">
             <FormItem>
               <FormLabel>Priorité</FormLabel>
               <FormControl>
@@ -173,26 +172,26 @@ const priorities = [
               <FormLabel>Materiel</FormLabel>
               <Combobox
                 :data="
-                  resource.getResoures.map((r) => {
+                  resource.getResources.map((r) => {
                     return {
                       value: r.id!,
                       label: r.resource,
                     };
                   })
                 "
-                name="materialId"
                 :setFieldValue="form.setFieldValue"
+                name="materialId"
               />
               <FormMessage />
             </FormItem>
           </FormField>
-          <FormField name="description" v-slot="{ componentField }">
+          <FormField v-slot="{ componentField }" name="description">
             <FormItem>
               <FormLabel>Problème</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Tell us a little bit about yourself"
                   class="resize-none"
+                  placeholder="Tell us a little bit about yourself"
                   v-bind="componentField"
                 />
               </FormControl>
