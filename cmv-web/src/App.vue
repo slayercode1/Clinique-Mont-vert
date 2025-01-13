@@ -76,7 +76,7 @@ const sidebarMenuItems = computed(() => {
   <Toaster />
   <Splashscreen v-if="showSplashscreen" @close="closeSplashscreen" />
   <SidebarProvider v-else>
-    <div class="w-full md:flex relative">
+    <div class="w-full md:flex">
       <!-- quil faut pas etre sur la  route /change-password et sur /forbidden et notfound -->
       <div
         v-if="
@@ -85,10 +85,11 @@ const sidebarMenuItems = computed(() => {
           $route.path !== '/forbidden' &&
           $route.path !== '/notfound'
         "
+        class="md:flex"
       >
         <AppSidebar :menu="sidebarMenuItems" />
         <SidebarTrigger />
-        <div class="absolute right-5 top-3">
+        <div v-if="session.getUser?.role.name === 'SuperAdmin'" class="absolute right-5 top-3">
           <DropdownMenu>
             <DropdownMenuTrigger>
               <Settings />

@@ -20,23 +20,25 @@ import {
 import { MoreHorizontal } from 'lucide-vue-next';
 import { useRouter } from 'vue-router';
 
-withDefaults(defineProps<{
-  data: any;
-  url?: string;
-  url_update?: boolean;
-  url_detail?: string;
-  detail: boolean;
-  handleDelete: () => void;
-}>(), {
-  url_update: true,
-});
+withDefaults(
+  defineProps<{
+    data: any;
+    url?: string;
+    url_update?: boolean;
+    url_detail?: string;
+    detail: boolean;
+    handleDelete?: () => void;
+  }>(),
+  {
+    url_update: true,
+  },
+);
 
 const router = useRouter();
 </script>
 
 <template>
   <AlertDialog>
-
     <DropdownMenu>
       <DropdownMenuTrigger as-child>
         <Button class="w-8 h-8 p-0" variant="ghost">
@@ -50,39 +52,34 @@ const router = useRouter();
           v-if="url_update"
           class="cursor-pointer"
           @click="
-          () =>
-            router.push({
-              path: url,
-              state: {
-                data: JSON.stringify(data),
-              },
-            })
-        "
-        >View Update
-        </DropdownMenuItem
-        >
+            () =>
+              router.push({
+                path: url,
+                state: {
+                  data: JSON.stringify(data),
+                },
+              })
+          "
+          >View Update
+        </DropdownMenuItem>
         <DropdownMenuItem
           v-if="detail"
           class="cursor-pointer"
           @click="
-          () =>
-            router.push({
-              path: url_detail,
-              state: {
-                data: JSON.stringify(data),
-              },
-            })
-        "
-        >View vehicle details
+            () =>
+              router.push({
+                path: url_detail,
+                state: {
+                  data: JSON.stringify(data),
+                },
+              })
+          "
+          >View vehicle details
         </DropdownMenuItem>
 
         <AlertDialogTrigger as-child>
-          <DropdownMenuItem
-            class="cursor-pointer">
-            Supprimer
-          </DropdownMenuItem>
+          <DropdownMenuItem class="cursor-pointer"> Supprimer </DropdownMenuItem>
         </AlertDialogTrigger>
-
       </DropdownMenuContent>
     </DropdownMenu>
     <AlertDialogContent>
@@ -95,5 +92,4 @@ const router = useRouter();
       </AlertDialogFooter>
     </AlertDialogContent>
   </AlertDialog>
-
 </template>

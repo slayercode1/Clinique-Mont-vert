@@ -35,7 +35,6 @@ gateway.use(express.json());
 gateway.use('/:service', proxy);
 
 if (process.env.NODE_ENV !== 'test') {
-  console.log(port);
   gateway.listen(port);
 }
 

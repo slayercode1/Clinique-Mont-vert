@@ -24,7 +24,7 @@ export const proxy = async (
   }
 
   // Log pour afficher l'URL complète à laquelle la requête sera envoyée (pour le débogage)
-  console.log(`${serviceUrl}${request.path}`);
+  //console.log(`${serviceUrl}${request.path}`);
 
   try {
     // Envoi de la requête HTTP au service cible en utilisant axios
