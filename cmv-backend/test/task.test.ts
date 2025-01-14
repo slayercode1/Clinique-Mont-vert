@@ -1,13 +1,12 @@
 import request from 'supertest';
 import gateway from '../src/app';
-import { describe, expect, beforeAll, it, afterAll } from '@jest/globals';
+import { afterAll, beforeAll, describe, expect, it } from '@jest/globals';
 import prisma from '../src/utils/prisma';
-
 
 describe('API Endpoints Fleet', () => {
   let token: string;
   let userId: string;
-  let ticketId: string
+  let ticketId: string;
   let serviceId: string;
 
   beforeAll(async () => {
@@ -38,8 +37,8 @@ describe('API Endpoints Fleet', () => {
       const service = await prisma.service.create({
         data: {
           name: 'ServiceTest',
-        }
-      })
+        },
+      });
 
       const material = await prisma.material.create({
         data: {
@@ -50,8 +49,8 @@ describe('API Endpoints Fleet', () => {
           supplier: 'Supplier1',
           state: 'IN_USE',
           expired_at: new Date(),
-        }
-      })
+        },
+      });
 
       const mockTicket = {
         description: 'Test description',
@@ -70,23 +69,21 @@ describe('API Endpoints Fleet', () => {
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
 
-      ticketId = response.body.data.id
-      serviceId = service.id
+      ticketId = response.body.data.id;
+      serviceId = service.id;
       await prisma.material.delete({
         where: {
-          id: material.id
-        }
-      })
-            
+          id: material.id,
+        },
+      });
     });
   });
 
   describe('GET /ticket/:id', () => {
     it('should return a single ticket', async () => {
-
       const response = await request(gateway)
         .get(`/it/ticket/${ticketId}`)
-        .set('Authorization', `Bearer ${token}`)
+        .set('Authorization', `Bearer ${token}`);
 
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
@@ -96,15 +93,13 @@ describe('API Endpoints Fleet', () => {
     it('should return 404 if ticket not found', async () => {
       const response = await request(gateway)
         .get(`/it/ticket/${ticketId}wsty`)
-        .set('Authorization', `Bearer ${token}`)
-      
+        .set('Authorization', `Bearer ${token}`);
+
       expect(response.status).toBe(404);
       expect(response.body.success).toBe(false);
       expect(response.body.message).toBe("La tâche n'a pas était trouver ");
     });
   });
-
-
 
   describe('PATCH /ticket/:id', () => {
     it('should update a ticket', async () => {
@@ -138,15 +133,15 @@ describe('API Endpoints Fleet', () => {
   afterAll(async () => {
     await prisma.ticket.delete({
       where: {
-        id: ticketId
-      }
-    })
+        id: ticketId,
+      },
+    });
 
     await prisma.service.delete({
       where: {
-        id: serviceId
-      }
-    })
+        id: serviceId,
+      },
+    });
 
     // Déconnexion après les tests
     await request(gateway)

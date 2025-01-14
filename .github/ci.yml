@@ -32,10 +32,12 @@ jobs:
       - name: Install and Test Backend
         working-directory: ./cmv-backend
         env:
-          DATABASE_URL: "postgresql://test:test@localhost:5432/test_db"
+          DATABASE_URL: postgresql://test:test@localhost:5432/test_db
         run: |
           npm install
           npm run build --if-present
+          npx prisma migrate deploy
+          npx prisma db seed
           npm test
 
       # Installer les dépendances et exécuter les commandes pour le frontend

@@ -33,7 +33,8 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "incremental": true,
-    "allowJs": true
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
   },
   "include": [
     "src/**/*"
