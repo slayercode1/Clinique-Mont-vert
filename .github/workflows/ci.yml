@@ -49,3 +49,4 @@ jobs:
           npx prisma migrate deploy
           npx prisma db seed
           npm test
+          exit $?
