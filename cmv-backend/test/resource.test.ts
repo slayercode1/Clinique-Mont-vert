@@ -99,5 +99,7 @@ describe('API Endpoints Resources', () => {
     await request(gateway)
       .post(`/it/sign-out/${userId}`)
       .set('Authorization', `Bearer ${token}`);
+    
+    gateway.listen().close();
   });
 });
