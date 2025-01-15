@@ -35,7 +35,7 @@ jobs:
       - name: Install and Test Backend
         working-directory: ./cmv-backend
         env:
-          DATABASE_URL: postgresql://test:test@localhost:5432/test_db
+          DATABASE_URL: postgresql://test:test@postgres:5432/test_db
           PORT_GATEWAY: 3000
           PORT_SERVICE_IT: 3001
           PORT_SERVICE_FLEET: 3002
