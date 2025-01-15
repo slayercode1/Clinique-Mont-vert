@@ -8,7 +8,6 @@
     "start": "concurrently \"node dist/app.js\" \"node dist/it_service/it-service.js\" \"node dist/fleet_service/fleet-service.js\"",
     "build": "tsc",
     "test": "concurrently \"tsx watch src/fleet_service/fleet-service.ts\" \"tsx watch src/it_service/it-service.ts\" \"jest\"",
-    "test:ci": "concurrently \"tsx watch src/fleet_service/fleet-service.ts\" \"tsx watch src/it_service/it-service.ts\" \"jest --forceExit\"",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "prettier": "prettier --check .",

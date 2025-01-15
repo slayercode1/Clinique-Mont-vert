@@ -14,5 +14,7 @@ const config: Config.InitialOptions = {
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1', // Corrige les imports avec extension .js
   },
+  detectOpenHandles: true,
+  forceExit: true,
 };
 export default config;
