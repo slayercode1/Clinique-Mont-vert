@@ -43,6 +43,8 @@ jobs:
           JWT_SECRET_KEY: "JgGoWl+JCmMMQTfZ6tvu8hqI7HQLkZ/Z9CeVRzvs9Ylv"
 
         run: |
+          apt-get update -y
+          apt-get install -y openssl
           npm install
           npx prisma migrate deploy
           npx prisma db seed
