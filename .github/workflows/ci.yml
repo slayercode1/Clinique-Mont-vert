@@ -48,4 +48,4 @@ jobs:
           npm install
           npx prisma migrate deploy
           npx prisma db seed
-          npm test:ci
+          npm run test:ci
