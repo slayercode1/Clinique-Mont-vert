@@ -1,8 +1,8 @@
 name: Node.js CI
 
-on:
-  push:
-    branches: [ fix/bug]
+push:
+    branches:
+      - "fix/*"
 
 jobs:
   container-job:
