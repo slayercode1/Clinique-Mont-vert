@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { h, onBeforeMount } from 'vue';
 import DataTable from '@/components/DataTable.vue';
 import { ColumnDef } from '@tanstack/vue-table';
@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { userStore } from '@/store/user.ts';
 import { UserType } from '@/utils/types';
+import DropdownAction from '@/components/data-table-dropdown.vue';
 
 const ticket = ticketStore();
 const user = userStore();
@@ -320,6 +321,22 @@ const columns: ColumnDef<Ticket>[] = [
       );
     },
   },
+  {
+    id: 'actions',
+    enableHiding: false,
+    cell: ({ row }) => {
+      const ticket = row.original as Ticket;
+      return h(
+        'div',
+        { class: 'relative' },
+        h(DropdownAction, {
+          data: ticket,
+          detail: true,
+          url_detail: `/ticket/${ticket.id}`,
+        }),
+      );
+    },
+  },
 ];
 </script>
 
@@ -353,11 +370,11 @@ const columns: ColumnDef<Ticket>[] = [
         </div>
       </div>
       <DataTable
-        permission-role="IT_ADMIN"
+        :click="() => router.push('/ticket-add')"
         :columns="columns"
         :data="ticket.getTickets"
         btn_text="Créer un ticket"
-        :click="() => router.push('/ticket-add')"
+        permission-role="IT_ADMIN"
       />
     </div>
   </div>

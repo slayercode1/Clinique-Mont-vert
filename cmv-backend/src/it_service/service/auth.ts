@@ -15,30 +15,33 @@ export const signIn = async (
     password: string;
   };
   try {
-
     if (!email || !p)
       return response.status(400).json({
         success: false,
         message: 'Email or password is missing',
       });
 
-    const accountExist = await prisma.user.findFirst({
-      where: {
-        email: email,
-      },
-      include: {
-        role: {
-          include: {
-            PermissionOnRole: {
-              include: {
-                role: true,
-                permission: true,
+    const accountExist = await prisma.user
+      .findFirst({
+        where: {
+          email: email,
+        },
+        include: {
+          role: {
+            include: {
+              PermissionOnRole: {
+                include: {
+                  role: true,
+                  permission: true,
+                },
               },
             },
           },
         },
-      },
-    });
+      })
+      .catch((err: any) => {
+        console.log(err);
+      });
 
     if (!accountExist)
       return response.status(400).json({

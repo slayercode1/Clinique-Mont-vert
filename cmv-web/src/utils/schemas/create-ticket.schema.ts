@@ -8,7 +8,7 @@ export const createTicketSchema = z.object({
   status: z
     .enum(['TODO', 'IN_PROGRESS', 'CLOSED', 'IN_VALIDATE', 'VALIDE', 'NOT_VALIDATE'])
     .optional(),
-  service: z.string().optional(),
+  serviceId: z.string().optional(),
   resolvedById: z.string().optional(),
   assignId: z.string().optional(),
   validated_at: z.string().optional(),

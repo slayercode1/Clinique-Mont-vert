@@ -2,7 +2,12 @@ import { createApp } from 'vue';
 import './assets/styles/style.css';
 import SignInView from './pages/auth/SignIn.vue';
 import NotFoundView from './pages/error/NotFound.vue';
-import { createRouter, createWebHistory, NavigationGuardNext, RouteLocationNormalized } from 'vue-router';
+import {
+  createRouter,
+  createWebHistory,
+  NavigationGuardNext,
+  RouteLocationNormalized,
+} from 'vue-router';
 import App from './App.vue';
 import { createPinia } from 'pinia';
 import ChangePasswordView from './pages/auth/ChangePassword.vue';
@@ -40,21 +45,21 @@ const routes = [
     path: '/settings',
     component: PermissionsView,
     meta: {
-      requiresRoles: ['IT_ADMIN', 'FLEET_ADMIN', 'SuperAdmin'],
+      requiresRoles: ['SuperAdmin'],
     },
   },
   {
     path: '/roles',
     component: RolesView,
     meta: {
-      requiresRoles: ['IT_ADMIN', 'FLEET_ADMIN', 'SuperAdmin'],
+      requiresRoles: ['SuperAdmin'],
     },
   },
   {
     path: '/services',
     component: ServicesView,
     meta: {
-      requiresRoles: ['IT_ADMIN', 'FLEET_ADMIN', 'SuperAdmin'],
+      requiresRoles: ['SuperAdmin'],
     },
   },
   {

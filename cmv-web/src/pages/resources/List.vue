@@ -222,7 +222,7 @@ const columns: ColumnDef<Resource>[] = [
           data: resource,
           url: `resource-update/${resource.id}`,
           detail: false,
-          handleDelete: () => handleDelete(resource.id),
+          handleDelete: () => handleDelete(resource.id as string),
         }),
       );
     },
