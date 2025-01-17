@@ -26,6 +26,12 @@ jobs:
           npm install
           npm run build
 
+      - name: List files
+        run: |
+          ls -la cmv-web/dist
+          ls -la cmv-backend/dist
+          ls -la
+
       - name: Copy files via SSH
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -36,8 +42,14 @@ jobs:
           source: |
             cmv-web/dist
             cmv-backend/dist
+            compose.yaml
+            cmv-web/Dockerfile
+            cmv-backend/Dockerfile
+            cmv-backend/package.json
+            cmv-backend/package-lock.json
           target: /var/html/clinique-monvert
           strip_components: 0
+          debug: true
 
       # - name: Create .env file backend
       #   run: echo "${{ secrets.ENV_FILE_BACK }}" > .env
