@@ -4,10 +4,10 @@
   "main": "dist/app.js",
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"tsx watch src/fleet_service/fleet-service.ts\" \"tsx watch src/it_service/it-service.ts\" \"tsx watch src/app.ts \"",
+    "dev": "concurrently --prefix-colors 'bgBlue.bold,bgGreen.bold,bgMagenta.bold' --names 'Fleet, It, Gateway' \"tsx watch src/fleet_service/fleet-service.ts\" \"tsx watch src/it_service/it-service.ts\" \"tsx watch src/app.ts\"",
     "start": "concurrently \"node dist/app.js\" \"node dist/it_service/it-service.js\" \"node dist/fleet_service/fleet-service.js\"",
     "build": "tsc",
-    "test": "concurrently \"tsx watch src/fleet_service/fleet-service.ts\" \"tsx watch src/it_service/it-service.ts\" \"jest --watchAll\"",
+    "test": "concurrently \"tsx src/fleet_service/fleet-service.ts\" \"tsx src/it_service/it-service.ts\" \"jest --watchAll\"",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "prettier": "prettier --check .",
@@ -31,7 +31,8 @@
     "express": "^4.21.1",
     "express-rate-limit": "^7.4.1",
     "helmet": "^8.0.0",
-    "nodemailer": "^6.9.16"
+    "nodemailer": "^6.9.16",
+    "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",

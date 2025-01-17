@@ -1,0 +1,54 @@
+services:
+  db:
+    image: postgres
+    env_file:
+      - ./cmv-backend/.env
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+      
+  frontend:
+    build:
+      context: ./cmv-web
+    volumes:
+      - frontend:/usr/src/app/cmv-web/dist
+    depends_on:
+      - server
+
+  server:
+    build:
+      context: ./cmv-backend
+    env_file:
+      - ./cmv-backend/.env
+    stdin_open: true  # Équivalent de -it pour garder le terminal interactif
+    tty: true         # Équivalent de -it pour garder un pseudo-terminal
+    ports:
+      - "5555:5555"
+    depends_on:
+      - db
+
+  caddy:
+    image: caddy:2.9-alpine
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - "8000:8000"
+      - "8080:8080"
+      - "443:443"
+    volumes:
+      - $PWD/conf:/etc/caddy
+      - frontend:/srv
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - db
+      - server
+      - frontend
+
+volumes:
+  frontend:
+  caddy_data:
+  caddy_config:
+  postgres-data:

@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { User } from './user';
+import { API_ENDPOINT } from './api-endpoint';
 
 export const authStore = defineStore('auth', {
   state() {
@@ -12,7 +13,7 @@ export const authStore = defineStore('auth', {
   actions: {
     async signin(payload: { email: string; password: string }) {
       try {
-        const response = await fetch(`http://localhost:3000/it/sign-in`, {
+        const response = await fetch(`${API_ENDPOINT}/it/sign-in`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -35,7 +36,7 @@ export const authStore = defineStore('auth', {
 
     async session() {
       try {
-        const response = await fetch(`http://localhost:3000/it/session`, {
+        const response = await fetch(`${API_ENDPOINT}/it/session`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('ssid')}`,
             'Content-Type': 'application/json', // optional, depending on the API requirements
@@ -58,7 +59,7 @@ export const authStore = defineStore('auth', {
     },
 
     async signout(id: string) {
-      await fetch(`http://localhost:3000/it/sign-out/${id}`, {
+      await fetch(`${API_ENDPOINT}/it/sign-out/${id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('ssid')}`,
           'Content-Type': 'application/json', // optional, depending on the API requirements
@@ -67,7 +68,7 @@ export const authStore = defineStore('auth', {
       });
     },
     async updateUser(password: Record<string, string>, id: string) {
-      const response = await fetch(`http://localhost:3000/it/change-password`, {
+      const response = await fetch(`${API_ENDPOINT}/it/change-password`, {
         method: 'PATCH',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('ssid')}`,
