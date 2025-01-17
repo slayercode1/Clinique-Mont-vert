@@ -24,7 +24,7 @@ jobs:
           npm run build
           cd ..
           cd cmv-web
-          npm install
+          npm install --include=dev
           npm run build
           cd ..
 
