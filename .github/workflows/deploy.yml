@@ -26,9 +26,6 @@ jobs:
           npm install
           npm run build
 
-      - name: List files
-        run: ls
-
       - name: Copy files via SSH
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -39,7 +36,7 @@ jobs:
           source: |
             cmv-web/dist
             cmv-backend/dist
-            docker-compose.yml
+            compose.yaml
             cmv-web/Dockerfile
             cmv-backend/Dockerfile
             cmv-backend/package.json
@@ -47,18 +44,18 @@ jobs:
           target: /var/html/clinique-monvert
           strip_components: 0
 
-      # - name: Create .env file backend
-      #   run: echo "${{ secrets.ENV_FILE_BACK }}" > .env
+      - name: Create .env file backend
+        run: echo "${{ secrets.ENV_FILE_BACK }}" > .env
 
-      # - name: Copy .env to VPS
-      #   uses: appleboy/scp-action@v0.1.7
-      #   with:
-      #     host: ${{ secrets.VPS_IP }}
-      #     username: ${{ secrets.VPS_USER }}
-      #     port: ${{ secrets.VPS_PORT }}
-      #     key: ${{ secrets.VPS_SSH_KEY }}
-      #     source: ".env"
-      #     target: /var/html/clinique-monvert/cmv-backend
+      - name: Copy .env to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_IP }}
+          username: ${{ secrets.VPS_USER }}
+          port: ${{ secrets.VPS_PORT }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          source: ".env"
+          target: /var/html/clinique-monvert/cmv-backend
 
       # - name: Start docker-compose
       #   uses: appleboy/ssh-action@v1.2.0
