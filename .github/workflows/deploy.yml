@@ -40,8 +40,8 @@ jobs:
           port: ${{ secrets.VPS_PORT }}
           key: ${{ secrets.VPS_SSH_KEY }}
           source: |
-            cmv-web/dist
-            cmv-backend/dist
+            cmv-web/dist/**
+            cmv-backend/dist/**
             compose.yaml
             cmv-web/Dockerfile
             cmv-backend/Dockerfile
