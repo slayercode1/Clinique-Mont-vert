@@ -12,22 +12,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '22'
-
-      - name: Install dependencies and build
-        run: |
-          cd cmv-backend
-          npm install
-          npm run build
-          cd ..
-          cd cmv-web
-          npm install --include=dev
-          npm run build
-          cd ..
-
       - name: Copy files via SSH
         uses: appleboy/scp-action@v0.1.7
         with:

@@ -11,5 +11,3 @@ RUN npm install --include=dev
 
 # Copy the rest of the source files into the image.
 COPY . .
-
-RUN npm run build

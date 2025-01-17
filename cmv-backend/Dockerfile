@@ -17,8 +17,6 @@ COPY . .
 # Generate Prisma client before switching users
 RUN npx prisma generate
 
-RUN npm run build
-
 # Expose the port that the application listens on
 EXPOSE 3000
 
