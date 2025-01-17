@@ -27,25 +27,25 @@ jobs:
           npm run build
 
       - name: List files
-        run: ls -R cmv-web cmv-backend
+        run: ls
 
-      # - name: Copy files via SSH
-      #   uses: appleboy/scp-action@v0.1.7
-      #   with:
-      #     host: ${{ secrets.VPS_IP }}
-      #     username: ${{ secrets.VPS_USER }}
-      #     port: ${{ secrets.VPS_PORT }}
-      #     key: ${{ secrets.VPS_SSH_KEY }}
-      #     source: |
-      #       cmv-web/dist
-      #       cmv-backend/dist
-      #       docker-compose.yml
-      #       cmv-web/Dockerfile
-      #       cmv-backend/Dockerfile
-      #       cmv-backend/package.json
-      #       cmv-backend/package-lock.json
-      #     target: /var/html/clinique-monvert
-      #     strip_components: 0
+      - name: Copy files via SSH
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_IP }}
+          username: ${{ secrets.VPS_USER }}
+          port: ${{ secrets.VPS_PORT }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          source: |
+            cmv-web/dist
+            cmv-backend/dist
+            docker-compose.yml
+            cmv-web/Dockerfile
+            cmv-backend/Dockerfile
+            cmv-backend/package.json
+            cmv-backend/package-lock.json
+          target: /var/html/clinique-monvert
+          strip_components: 0
 
       # - name: Create .env file backend
       #   run: echo "${{ secrets.ENV_FILE_BACK }}" > .env
