@@ -34,7 +34,7 @@ jobs:
         run: echo "${{ secrets.ENV_FILE_BACK }}" > .env
 
       - name: Copy .env to VPS
-        uses: appleboy/scp-action@v0.2.4
+        uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.VPS_IP }}
           username: ${{ secrets.VPS_USER }}
