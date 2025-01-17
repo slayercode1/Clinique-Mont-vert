@@ -27,7 +27,7 @@ jobs:
           npm run build
 
       - name: List files
-        run: ls -R cmv-web/dist cmv-backend/dist
+        run: ls -R cmv-web cmv-backend
 
       # - name: Copy files via SSH
       #   uses: appleboy/scp-action@v0.1.7
