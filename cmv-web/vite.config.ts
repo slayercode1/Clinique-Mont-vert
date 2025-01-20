@@ -13,6 +13,15 @@ export default defineConfig({
       plugins: [tailwind(), autoprefixer()],
     },
   },
+  server: {
+    proxy: {
+      '/api': {
+        target: 'https://api-clinique-monvert.yann-dev.fr',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, '')
+      }
+    }
+  },
   plugins: [vue()],
   resolve: {
     alias: {
