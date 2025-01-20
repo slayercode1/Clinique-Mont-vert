@@ -1,1 +1,1 @@
-export const API_ENDPOINT = 'api-clinique-monvert.yann-dev.fr'
+export const API_ENDPOINT = 'https://api-clinique-monvert.yann-dev.fr'
