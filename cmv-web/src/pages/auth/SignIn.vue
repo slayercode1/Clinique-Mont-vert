@@ -25,7 +25,7 @@ const handleSubmit = (value: { email: string; password: string }) => {
     .then((data) => {
       token.login(data.data.token);
       isLoading.value = false;
-      if (document.cookie.includes('onbording')) {
+      if (document.cookie.includes('onbording=')) {
         router.replace('/users-list');
       } else {
         router.replace('/change-password');
