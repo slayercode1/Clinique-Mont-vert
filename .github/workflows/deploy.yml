@@ -1,8 +1,8 @@
 name: Deploy to vps
 
 on:
-  push:
-    branches: [ fix/bug ]
+  pull_request: 
+    branches: [ main ]
 
 jobs:
   build:
@@ -36,7 +36,6 @@ jobs:
           source: "cmv-web/dist/*, cmv-backend/prisma/*, cmv-backend/views/*, cmv-backend/dist/*, compose.yaml, cmv-backend/Dockerfile, cmv-backend/package.json, cmv-backend/package-lock.json, conf/*"
           target: /var/html/clinique-monvert
           strip_components: 0
-          debug: true
 
       - name: Create .env file backend
         run: echo "${{ secrets.ENV_FILE_BACK }}" > .env

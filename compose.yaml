@@ -19,13 +19,13 @@ services:
       - db
 
   caddy:
-    image: caddy:2.9-alpine
+    build:
+      context: ./config
     restart: unless-stopped
     cap_add:
       - NET_ADMIN
     ports:
-      - "8000:8000"
-      - "8080:8080"
+      - "80:80"
       - "443:443"
     volumes:
       - $PWD/conf:/etc/caddy
