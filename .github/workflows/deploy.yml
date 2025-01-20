@@ -59,7 +59,7 @@ jobs:
           port: ${{ secrets.VPS_PORT }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            cd /usr/var/html/clinique-monvert/
+            cd /var/html/clinique-monvert/
             docker compose down || true
             docker compose pull
             docker compose up --build -d
