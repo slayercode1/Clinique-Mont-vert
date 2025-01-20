@@ -1,12 +1,51 @@
-:8000 {
-	encode gzip
+{
+    order coraza_waf first
+}
+
+api-clinique-monvert.yann-dev.fr {
+	encode gzip zstd
+	coraza_waf {
+		load_owasp_crs 
+		directives `
+		Include @coraza.conf-recommended
+		Include @crs-setup.conf.example
+		Include @owasp_crs/*.conf
+		SecRuleEngine On
+		`
+  }
+
+  handle_errors 403 {
+		header X-Blocked "true"
+		root * /etc/caddy/error-pages
+		rewrite * /{err.status_code}.html
+		file_server
+		templates
+	}
+
 	reverse_proxy server:3000
 }
 
-:8080 {
-	encode gzip
-	file_server
+clinique-monvert.yann-dev.fr {
+	encode gzip zstd
+	coraza_waf {
+		load_owasp_crs
+		directives `
+		Include @coraza.conf-recommended
+		Include @crs-setup.conf.example
+		Include @owasp_crs/*.conf
+		SecRuleEngine On
+		`
+	}
 
+  handle_errors 403 {
+		header X-Blocked "true"
+		root * /etc/caddy/error-pages
+		rewrite * /{err.status_code}.html
+		file_server
+		templates
+	}
+	
+	file_server
 	root * /srv
 	try_files {path} /index.html
 	file_server

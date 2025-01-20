@@ -10,7 +10,10 @@
     ],
     "outDir": "./dist",
     "rootDir": "./src",
-    "types": ["jest", "node"],
+    "types": [
+      "jest",
+      "node"
+    ],
     // Configuration stricte
     "strict": true,
     "noImplicitAny": false,
@@ -37,7 +40,8 @@
     "allowSyntheticDefaultImports": true,
   },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "src/utils/prisma.ts"
   ],
   "exclude": [
     "node_modules",
