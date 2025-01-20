@@ -20,7 +20,7 @@ services:
 
   caddy:
     build:
-      context: ./config
+      context: ./conf
     restart: unless-stopped
     cap_add:
       - NET_ADMIN
