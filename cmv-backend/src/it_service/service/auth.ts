@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-import prisma from '../../../prisma/prisma.js';
+import prisma from '../../utils/prisma.js';
 
 dotenv.config();
 

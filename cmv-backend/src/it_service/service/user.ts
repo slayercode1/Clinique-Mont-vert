@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import { sendemail } from './task.js';
-import prisma from '../../../prisma/prisma.js';
+import prisma from '../../utils/prisma.js';
 import { UserType } from '../../utils/types/index.js';
 
 export const getUsers = async (

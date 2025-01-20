@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import prisma from '../../../prisma/prisma.js';
+import prisma from '../../utils/prisma.js';
 import { CostType, VehicleType } from '../../utils/types/index.js';
 
 export const getVehicles = async (

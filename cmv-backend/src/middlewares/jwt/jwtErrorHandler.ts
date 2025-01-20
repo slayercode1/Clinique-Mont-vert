@@ -1,7 +1,7 @@
 import * as dotenv from 'dotenv';
 import type { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import prisma from '../../../prisma/prisma.js';
+import prisma from '../../utils/prisma.js';
 
 dotenv.config();
 

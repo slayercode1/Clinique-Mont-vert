@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import prisma from '../../../prisma/prisma.js';
+import prisma from '../../utils/prisma.js';
 import { TicketType } from '../../utils/types/index.js';
 import { render } from '../../utils/edge.js';
 import { transporter } from '../../utils/mailer.js';
