@@ -1,0 +1,1 @@
+export const API_ENDPOINT = 'api-clinique-monvert.yann-dev.fr'

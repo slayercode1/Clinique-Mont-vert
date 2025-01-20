@@ -2,9 +2,6 @@ ARG NODE_VERSION=22.11.0
 
 FROM node:${NODE_VERSION}-alpine
 
-# Use production node environment by default.
-ENV NODE_ENV production
-
 # Set working directory
 WORKDIR /usr/src/app/cmv-backend
 
@@ -12,15 +9,14 @@ WORKDIR /usr/src/app/cmv-backend
 COPY ./package*.json ./
 
 # Install dependencies including dev dependencies
-RUN npm install --include=dev
+RUN npm install
 
-# Copy the rest of the source files into the image
-COPY . .
+# Copy the dist folder to the working directory
+COPY ./dist ./dist
 
-# Generate Prisma client before switching users
+COPY ./prisma ./prisma
+
 RUN npx prisma generate
-
-RUN npm run build
 
 # Expose the port that the application listens on
 EXPOSE 3000

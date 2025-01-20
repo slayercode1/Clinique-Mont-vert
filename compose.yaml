@@ -1,0 +1,46 @@
+services:
+  db:
+    image: postgres
+    env_file:
+      - ./cmv-backend/.env
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+
+  server:
+    build:
+      context: ./cmv-backend
+    env_file:
+      - ./cmv-backend/.env
+    stdin_open: true  # Équivalent de -it pour garder le terminal interactif
+    tty: true         # Équivalent de -it pour garder un pseudo-terminal
+    depends_on:
+      - db
+
+  caddy:
+    build:
+      context: ./config
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - $PWD/conf:/etc/caddy
+      - $PWD/cmv-web/dist:/srv
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - db
+      - server
+
+volumes:
+  caddy_data:
+  caddy_config:
+  postgres-data:
+
+
+
+# docker exec -it cmv-backend_server_1 sh

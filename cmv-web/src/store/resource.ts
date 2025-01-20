@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import { API_ENDPOINT } from './api-endpoint';
 
 export type Resource = {
   id?: string;
@@ -30,7 +31,7 @@ export const resourceStore = defineStore('resource', {
   actions: {
     async fetchResources() {
       try {
-        const response = await fetch('http://localhost:3000/it/resources', {
+        const response = await fetch(`${API_ENDPOINT}/it/resources`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('ssid')}`,
             'Content-Type': 'application/json', // optional, depending on the API requirements
@@ -45,7 +46,7 @@ export const resourceStore = defineStore('resource', {
 
     async fetchResource(id: string) {
       try {
-        const response = await fetch(`http://localhost:3000/it/resource/${id}`, {
+        const response = await fetch(`${API_ENDPOINT}/it/resource/${id}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('ssid')}`,
             'Content-Type': 'application/json', // optional, depending on the API requirements
@@ -59,7 +60,7 @@ export const resourceStore = defineStore('resource', {
     },
 
     async createResource(resource: Resource) {
-      const response = await fetch('http://localhost:3000/it/resource', {
+      const response = await fetch(`${API_ENDPOINT}/it/resource`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('ssid')}`,
@@ -76,7 +77,7 @@ export const resourceStore = defineStore('resource', {
     },
 
     async updateResource(resource: unknown, id: string) {
-      const response = await fetch(`http://localhost:3000/it/resource/${id}`, {
+      const response = await fetch(`${API_ENDPOINT}/it/resource/${id}`, {
         method: 'PATCH',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('ssid')}`,
@@ -95,7 +96,7 @@ export const resourceStore = defineStore('resource', {
     },
 
     async deleteResource(id: string) {
-      await fetch(`http://localhost:3000/it/delete-resource/${id}`, {
+      await fetch(`${API_ENDPOINT}/it/delete-resource/${id}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('ssid')}`,

@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { Resource } from './resource';
 import { TicketType, UserType } from '@/utils/types';
+import { API_ENDPOINT } from './api-endpoint';
 
 export interface Ticket {
   id: string;
@@ -33,7 +34,7 @@ export const ticketStore = defineStore('ticket', {
   actions: {
     async fetchTickets() {
       try {
-        const response = await fetch('http://localhost:3000/it/tickets', {
+        const response = await fetch(`${API_ENDPOINT}/it/tickets`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('ssid')}`,
             'Content-Type': 'application/json', // optional, depending on the API requirements
@@ -48,7 +49,7 @@ export const ticketStore = defineStore('ticket', {
 
     async fetchTicket(id: string) {
       try {
-        const response = await fetch(`http://localhost:3000/it/ticket/${id}`, {
+        const response = await fetch(`${API_ENDPOINT}/it/ticket/${id}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('ssid')}`,
             'Content-Type': 'application/json', // optional, depending on the API requirements
@@ -62,7 +63,7 @@ export const ticketStore = defineStore('ticket', {
     },
 
     async createTicket(ticket: TicketType) {
-      const response = await fetch('http://localhost:3000/it/ticket', {
+      const response = await fetch(`${API_ENDPOINT}/it/ticket`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('ssid')}`,
@@ -79,7 +80,7 @@ export const ticketStore = defineStore('ticket', {
     },
 
     async updateTicket(payload: unknown, id: string) {
-      const response = await fetch(`http://localhost:3000/it/ticket/${id}`, {
+      const response = await fetch(`${API_ENDPOINT}/it/ticket/${id}`, {
         method: 'PATCH',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('ssid')}`,
@@ -99,7 +100,7 @@ export const ticketStore = defineStore('ticket', {
     },
 
     async deleteTicket(id: string) {
-      await fetch(`http://localhost:3000/it/delete-ticket/${id}`, {
+      await fetch(`${API_ENDPOINT}/it/delete-ticket/${id}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('ssid')}`,

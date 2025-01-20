@@ -1,5 +1,7 @@
 import * as bcrypt from 'bcrypt';
-import prisma from '../src/utils/prisma';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient()
 
 async function createRoles() {
   // Crée les rôles

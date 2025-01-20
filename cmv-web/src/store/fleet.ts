@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { CostType, VehicleType } from '@/utils/types';
+import { API_ENDPOINT } from './api-endpoint';
 
 export const fleetStore = defineStore('fleet', {
   state() {
@@ -23,7 +24,7 @@ export const fleetStore = defineStore('fleet', {
   actions: {
     async fetchFleets() {
       try {
-        const response = await fetch('http://localhost:3000/fleet/vehicles', {
+        const response = await fetch(`${API_ENDPOINT}/fleet/vehicles`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('ssid')}`,
             'Content-Type': 'application/json',
@@ -38,7 +39,7 @@ export const fleetStore = defineStore('fleet', {
 
     async fetchFleet(id: string) {
       try {
-        const response = await fetch(`http://localhost:3000/fleet/vehicle/${id}`, {
+        const response = await fetch(`${API_ENDPOINT}/fleet/vehicle/${id}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('ssid')}`,
             'Content-Type': 'application/json',
@@ -53,7 +54,7 @@ export const fleetStore = defineStore('fleet', {
 
     async fetchCost(id: string) {
       try {
-        const response = await fetch(`http://localhost:3000/fleet/vehicle_cost/${id}`, {
+        const response = await fetch(`${API_ENDPOINT}/fleet/vehicle_cost/${id}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('ssid')}`,
             'Content-Type': 'application/json',
@@ -67,7 +68,7 @@ export const fleetStore = defineStore('fleet', {
     },
 
     async createFleet(vehicle: VehicleType) {
-      const response = await fetch('http://localhost:3000/fleet/create-vehicle', {
+      const response = await fetch(`${API_ENDPOINT}/fleet/create-vehicle`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('ssid')}`,
@@ -84,7 +85,7 @@ export const fleetStore = defineStore('fleet', {
     },
 
     async createCost(cost: CostType) {
-      const response = await fetch('http://localhost:3000/fleet/create-cost', {
+      const response = await fetch(`${API_ENDPOINT}/fleet/create-cost`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('ssid')}`,
@@ -101,7 +102,7 @@ export const fleetStore = defineStore('fleet', {
     },
 
     async updateFleet(vehicle: Partial<VehicleType>, id: string) {
-      const response = await fetch(`http://localhost:3000/fleet/update-vehicle/${id}`, {
+      const response = await fetch(`${API_ENDPOINT}/fleet/update-vehicle/${id}`, {
         method: 'PATCH',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('ssid')}`,
@@ -118,7 +119,7 @@ export const fleetStore = defineStore('fleet', {
     },
 
     async deleteCost(id: string) {
-      const response = await fetch(`http://localhost:3000/fleet/delete-cost/${id}`, {
+      const response = await fetch(`${API_ENDPOINT}/fleet/delete-cost/${id}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('ssid')}`,
@@ -134,7 +135,7 @@ export const fleetStore = defineStore('fleet', {
     },
 
     async deleteVehicle(id: string) {
-      const response = await fetch(`http://localhost:3000/fleet/delete-vehicle/${id}`, {
+      const response = await fetch(`${API_ENDPOINT}/fleet/delete-vehicle/${id}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('ssid')}`,

@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { Payload, UserType } from '@/utils/types';
+import { API_ENDPOINT } from './api-endpoint';
 
 //Pour ajouter un champ a un type exitant
 export type User = UserType & {
@@ -33,7 +34,7 @@ export const userStore = defineStore('user', {
   actions: {
     async fetchUsers() {
       try {
-        const response = await fetch('http://localhost:3000/it/users', {
+        const response = await fetch(`${API_ENDPOINT}/it/users`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('ssid')}`,
             'Content-Type': 'application/json',
@@ -48,7 +49,7 @@ export const userStore = defineStore('user', {
 
     async fetchUser(id: string) {
       try {
-        const response = await fetch(`http://localhost:3000/it/user/${id}`, {
+        const response = await fetch(`${API_ENDPOINT}/it/user/${id}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('ssid')}`,
             'Content-Type': 'application/json',
@@ -63,7 +64,7 @@ export const userStore = defineStore('user', {
 
     async fetchRoles() {
       try {
-        const response = await fetch('http://localhost:3000/it/roles', {
+        const response = await fetch(`${API_ENDPOINT}/it/roles`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('ssid')}`,
             'Content-Type': 'application/json',
@@ -78,7 +79,7 @@ export const userStore = defineStore('user', {
 
     async fetchServices() {
       try {
-        const response = await fetch('http://localhost:3000/it/services', {
+        const response = await fetch(`${API_ENDPOINT}/it/services`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('ssid')}`,
             'Content-Type': 'application/json',
@@ -93,7 +94,7 @@ export const userStore = defineStore('user', {
 
     async fetchPermissions() {
       try {
-        const response = await fetch('http://localhost:3000/it/permissions', {
+        const response = await fetch(`${API_ENDPOINT}/it/permissions`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('ssid')}`,
             'Content-Type': 'application/json',
@@ -108,7 +109,7 @@ export const userStore = defineStore('user', {
     },
 
     async createUser(user: UserType) {
-      const response = await fetch('http://localhost:3000/it/user', {
+      const response = await fetch(`${API_ENDPOINT}/it/user`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('ssid')}`,
@@ -125,7 +126,7 @@ export const userStore = defineStore('user', {
     },
 
     async updateuser(user: UserType, id: string) {
-      const response = await fetch(`http://localhost:3000/it/user/${id}`, {
+      const response = await fetch(`${API_ENDPOINT}/it/user/${id}`, {
         method: 'PATCH',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('ssid')}`,
@@ -143,7 +144,7 @@ export const userStore = defineStore('user', {
 
     async deleteUser(id: string) {
       try {
-        const response = await fetch(`http://localhost:3000/it/delete-user/${id}`, {
+        const response = await fetch(`${API_ENDPOINT}/it/delete-user/${id}`, {
           method: 'DELETE',
           headers: {
             Authorization: `Bearer ${localStorage.getItem('ssid')}`,
@@ -162,7 +163,7 @@ export const userStore = defineStore('user', {
     },
 
     async createRole(name: string) {
-      const response = await fetch('http://localhost:3000/it/role', {
+      const response = await fetch(`${API_ENDPOINT}/it/role`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('ssid')}`,
@@ -179,7 +180,7 @@ export const userStore = defineStore('user', {
     },
 
     async createService(name: string) {
-      const response = await fetch('http://localhost:3000/it/service', {
+      const response = await fetch(`${API_ENDPOINT}/it/service`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('ssid')}`,
@@ -196,7 +197,7 @@ export const userStore = defineStore('user', {
     },
 
     async createOrUpdatePermission(payload: Payload) {
-      const response = await fetch('http://localhost:3000/it/permission', {
+      const response = await fetch(`${API_ENDPOINT}/it/permission`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('ssid')}`,
