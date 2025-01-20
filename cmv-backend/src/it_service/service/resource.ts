@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import prisma from '../../utils/prisma.js';
+import prisma from '../../../prisma/prisma.js';
 import { ResourceType } from '../../utils/types/index.js';
 
 export const getResources = async (

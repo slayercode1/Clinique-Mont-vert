@@ -1,5 +1,5 @@
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
-import prisma from '../../utils/prisma.js';
+import prisma from '../../../prisma/prisma.js';
 
 // Middleware RBAC (Contrôle d'accès basé sur les rôles)
 export const RBAC = (action: string, resource: string): RequestHandler => {

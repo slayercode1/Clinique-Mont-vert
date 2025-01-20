@@ -1,9 +1,9 @@
-:8000 {
+api-clinique-monvert.yann-dev.fr {
 	encode gzip
 	reverse_proxy server:3000
 }
 
-:8080 {
+clinique-monvert.yann-dev.fr {
 	encode gzip
 	file_server
 
