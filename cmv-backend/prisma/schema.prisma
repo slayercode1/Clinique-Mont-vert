@@ -16,6 +16,7 @@ model User {
   email             String
   password          String
   deleted           Boolean  @default(false)
+  isChangePassword  Boolean  @default(false)
   status            Status   @default(INACTIF)
   role              Role     @relation(fields: [roleId], references: [id])
   roleId            String

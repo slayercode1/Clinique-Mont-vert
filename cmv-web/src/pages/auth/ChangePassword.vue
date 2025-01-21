@@ -4,7 +4,6 @@ import z from 'zod';
 import { Button } from '@/components/ui/button';
 import { authStore } from '@/store/auth';
 import { toast } from 'vue-sonner';
-import { setCookie } from '@/utils/functions';
 import { useRouter } from 'vue-router';
 import { ref } from 'vue';
 
@@ -19,12 +18,11 @@ const formChangePasswordSchema = z.object({
 const handleSubmit = (value: Record<string, string>) => {
   isLoading.value = true;
   auth
-    .updateUser(value, auth.getUser?.id!)
+    .updateUser({ ...value, isChangePassword: true }, auth.getUser?.id!)
     .then((data) => {
       toast.success(data?.message, {
         position: 'top-right',
       });
-      setCookie('onbording', true, 365);
       switch (true) {
         case auth.getUser?.role.name.startsWith('IT'):
           router?.replace('users-list');
@@ -59,10 +57,7 @@ const handleSubmit = (value: Record<string, string>) => {
         Pour sécuriser votre compte et continuer à utiliser l'application, il est obligatoire de
         changer votre mot de passe provisoire.
       </p>
-      <AutoForm
-        class="mb-0 mt-6 space-y-4 p-4 sm:p-6 lg:p-8"
-        @submit="handleSubmit"
-        :schema="formChangePasswordSchema"
+      <AutoForm class="mb-0 mt-6 space-y-4 p-4 sm:p-6 lg:p-8" @submit="handleSubmit" :schema="formChangePasswordSchema"
         :field-config="{
           password: {
             label: 'Mot de passe',
@@ -72,8 +67,7 @@ const handleSubmit = (value: Record<string, string>) => {
               autocomplete: 'current-password',
             },
           },
-        }"
-      >
+        }">
         <Button type="submit" class="mt-4 w-full text-center">
           <span v-if="isLoading" class="loaderBtn"></span>
           <span v-else> Enregistrer mon mot de passe </span>

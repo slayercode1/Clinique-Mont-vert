@@ -169,6 +169,7 @@ export const updateUsers = async (
         lastname: body.lastname,
         status: body.status,
         serviceId: body.serviceId,
+        isChangePassword: body.ischangePassword,
       },
       include: {
         role: true,
