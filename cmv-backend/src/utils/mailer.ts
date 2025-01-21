@@ -4,7 +4,11 @@ import SMTPTransport from 'nodemailer/lib/smtp-transport';
 dotenv.config();
 export const transporter: Transporter<SMTPTransport.SentMessageInfo> =
   nodemailer.createTransport({
-    host: 'localhost',
-    port: 1025,
-    secure: false, // true for 465, false for other ports
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
+    auth: {
+      user: process.env.EMAIL,
+      pass: process.env.EMAIL_PASS
+    }
   });

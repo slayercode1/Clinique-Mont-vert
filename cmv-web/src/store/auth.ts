@@ -67,7 +67,7 @@ export const authStore = defineStore('auth', {
         method: 'POST',
       });
     },
-    async updateUser(password: Record<string, string>, id: string) {
+    async updateUser(password: Record<string, any>, id: string) {
       const response = await fetch(`${API_ENDPOINT}/it/change-password`, {
         method: 'PATCH',
         headers: {

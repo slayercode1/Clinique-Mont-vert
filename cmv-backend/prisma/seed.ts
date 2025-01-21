@@ -100,6 +100,7 @@ async function main() {
       status: 'ACTIF',
       roleId: superAdminRole!.id,
       serviceId: service.id,
+      isChangePassword: true,
     },
   });
   return;

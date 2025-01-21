@@ -9,6 +9,7 @@ export type User = UserType & {
     name: string;
   };
   id: string;
+  isChangePassword: boolean;
 };
 
 export const userStore = defineStore('user', {

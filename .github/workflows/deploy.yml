@@ -59,7 +59,7 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             cd /var/html/clinique-monvert/
-            docker compose down || true
+            docker compose stop || true
             docker compose pull
             docker compose up --build -d
             docker image prune -f
