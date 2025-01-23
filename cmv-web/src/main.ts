@@ -199,6 +199,9 @@ router.beforeEach(
       if (roleName.startsWith('FLEET')) {
         return next('/fleets-list');
       }
+      if (roleName === 'SuperAdmin') {
+        return next('/users-list');
+      }
       return next('/forbidden');
     };
 
@@ -228,7 +231,7 @@ router.beforeEach(
     if (!isChangePassword && to.path !== '/change-password') {
       return next('/change-password');
     } else if (isChangePassword && to.path === '/change-password') {
-      return next('/users-list');
+      return redirectByRole();
     }
 
 
