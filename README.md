@@ -49,6 +49,12 @@ Creer un .env a la racine du dossier cmv-backend et mettre les envirommennt ci-d
 ``POSTGRES_DB``
 ``POSTGRES_USER``
 ``POSTGRES_PASSWORD``
+``EMAIL``
+``EMAIL_PASSWORD``
+
+> Importante: Pour le bon fonctionnement de l'application il ne faux pas oublier de changer l'url qui se trouver dans le fichie cmv-web/vite.config.ts
+
+> Importante: Pour le bon fonctionnement de l'application il ne faux pas oublier de changer l'url qui se trouver dans le fichie cmv-web/vite.config.ts
 
 ## Running Tests
 

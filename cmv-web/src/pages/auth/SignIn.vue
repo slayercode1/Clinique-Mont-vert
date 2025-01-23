@@ -25,7 +25,8 @@ const handleSubmit = (value: { email: string; password: string }) => {
     .then((data) => {
       token.login(data.data.token);
       isLoading.value = false;
-      if (document.cookie.includes('onbording')) {
+
+      if (data.data.isChangePassword) {
         router.replace('/users-list');
       } else {
         router.replace('/change-password');
@@ -45,28 +46,23 @@ const handleSubmit = (value: { email: string; password: string }) => {
     <div class="w-[450px]">
       <h1 class="text-center text-2xl font-bold text-black sm:text-3xl">CLINIQUE MONT-VERT</h1>
 
-      <AutoForm
-        :field-config="{
-          email: {
-            label: 'Addresse e-mail',
-            inputProps: {
-              type: 'email',
-              placeholder: 'e.g: exxemple@exemple.com',
-            },
+      <AutoForm :field-config="{
+        email: {
+          label: 'Addresse e-mail',
+          inputProps: {
+            type: 'email',
+            placeholder: 'e.g: exxemple@exemple.com',
           },
-          password: {
-            label: 'Mot de passe',
-            component: 'password',
-            inputProps: {
-              placeholder: '*********',
-              autocomplete: 'current-password',
-            },
+        },
+        password: {
+          label: 'Mot de passe',
+          component: 'password',
+          inputProps: {
+            placeholder: '*********',
+            autocomplete: 'current-password',
           },
-        }"
-        :schema="formSignInSchema"
-        class="mb-0 mt-6 space-y-4 p-4 sm:p-6 lg:p-8"
-        @submit="handleSubmit"
-      >
+        },
+      }" :schema="formSignInSchema" class="mb-0 mt-6 space-y-4 p-4 sm:p-6 lg:p-8" @submit="handleSubmit">
         <Button class="mt-4 w-full text-center" type="submit">
           <span v-if="isLoading" class="loaderBtn"></span>
           <span v-else> Connexion </span>

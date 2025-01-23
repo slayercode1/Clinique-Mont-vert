@@ -17,4 +17,5 @@ export const updateUserSchema = z.object({
   status: z.enum(['ACTIF', 'INACTIF']).optional(),
   role: z.string().optional(),
   serviceId: z.string().optional(),
+  isChangePassword: z.boolean().optional(),
 });

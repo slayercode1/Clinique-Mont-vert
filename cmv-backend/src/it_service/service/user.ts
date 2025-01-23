@@ -122,7 +122,7 @@ export const createUser = async (
 
     sendemail(
       'password.edge',
-      { user: user, paswword: body.password },
+      { user: user, password: body.password },
       user.email,
       'Mot de passe temporaire pour première connexion',
       response
@@ -169,6 +169,7 @@ export const updateUsers = async (
         lastname: body.lastname,
         status: body.status,
         serviceId: body.serviceId,
+        isChangePassword: body.ischangePassword,
       },
       include: {
         role: true,

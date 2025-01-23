@@ -153,7 +153,6 @@ router.beforeEach(
   async (to: RouteLocationNormalized, _: RouteLocationNormalized, next: NavigationGuardNext) => {
     const isAuth = useTokenStore();
     const session = authStore();
-
     // Un seul appel à session.session()
     if (isAuth.getIsAuthenticated) {
       await session.session();
@@ -200,6 +199,9 @@ router.beforeEach(
       if (roleName.startsWith('FLEET')) {
         return next('/fleets-list');
       }
+      if (roleName === 'SuperAdmin') {
+        return next('/users-list');
+      }
       return next('/forbidden');
     };
 
@@ -224,13 +226,14 @@ router.beforeEach(
     }
 
     // Vérifie si l'utilisateur doit changer son mot de passe
-    const isOnboarding = document.cookie.includes('onbording=');
-    if (!isOnboarding && isPathProtected(to.path)) {
+    const isChangePassword = session.getUser?.isChangePassword;
+
+    if (!isChangePassword && to.path !== '/change-password') {
       return next('/change-password');
-    }
-    if (isOnboarding && to.path === '/change-password') {
+    } else if (isChangePassword && to.path === '/change-password') {
       return redirectByRole();
     }
+
 
     // Continue vers la route demandée si aucune redirection n'est nécessaire
     next();
