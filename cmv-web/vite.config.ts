@@ -13,11 +13,11 @@ export default defineConfig({
       plugins: [tailwind(), autoprefixer()],
     },
   },
+  base: './',
   server: {
     proxy: {
       '/api': {
         target: 'https://api-clinique-monvert.yann-dev.fr',
-        //target: 'http://localhost:3000',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '')
       }

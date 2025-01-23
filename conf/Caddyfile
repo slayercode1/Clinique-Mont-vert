@@ -45,7 +45,6 @@ clinique-monvert.yann-dev.fr {
 		templates
 	}
 	
-	file_server
 	root * /srv
 	try_files {path} /index.html
 	file_server
