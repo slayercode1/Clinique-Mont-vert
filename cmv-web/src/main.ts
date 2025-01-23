@@ -228,6 +228,7 @@ router.beforeEach(
     // Vérifie si l'utilisateur doit changer son mot de passe
     const isChangePassword = session.getUser?.isChangePassword;
 
+
     if (isChangePassword && to.path === '/change-password') {
       return redirectByRole();
     }
