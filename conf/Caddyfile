@@ -25,7 +25,7 @@ api-clinique-monvert.yann-dev.fr {
 	reverse_proxy server:3000
 }
 
-clinique-monvert.yann-dev.fr {
+clinique-montvert.yann-dev.fr {
 	encode gzip zstd
 	coraza_waf {
 		load_owasp_crs
@@ -44,8 +44,8 @@ clinique-monvert.yann-dev.fr {
 		file_server
 		templates
 	}
-	
+
+	file_server
 	root * /srv
 	try_files {path} /index.html
-	file_server
 }
