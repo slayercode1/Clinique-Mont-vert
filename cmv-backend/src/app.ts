@@ -9,8 +9,7 @@ dotenv.config();
 
 const gateway = express();
 const port = process.env.PORT_GATEWAY;
-//gateway.use(helmet());
-// gateway.use( (req, res, next) => logger(req, res, next))
+gateway.use(helmet());
 gateway.use(
   helmet.hsts({
     maxAge: 31536000, // 1 an
@@ -22,6 +21,7 @@ gateway.use(
   cors({
     origin: process.env.CORS_ORIGIN,
     optionsSuccessStatus: 200,
+    methods: ['GET', 'POST', 'PATCH', 'DELETE'],
   })
 );
 const limiter = rateLimit({

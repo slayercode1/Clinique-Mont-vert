@@ -21,6 +21,7 @@ fleet_service.use(
   cors({
     origin: 'http://localhost:3000',
     optionsSuccessStatus: 200,
+    methods: ['GET', 'POST', 'PATCH', 'DELETE'],
   })
 );
 const limiter = rateLimit({
