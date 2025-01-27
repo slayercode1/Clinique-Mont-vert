@@ -24,6 +24,7 @@ it_service.use(
     methods: ['GET', 'POST', 'PATCH', 'DELETE'],
   })
 );
+it_service.set('trust proxy', 'loopback, linklocal, uniquelocal');
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   limit: 100,

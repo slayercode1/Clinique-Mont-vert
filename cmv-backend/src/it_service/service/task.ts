@@ -17,8 +17,8 @@ export const getTickets = async (
         assign: true,
       },
       where: {
-        deleted: false
-      }
+        deleted: false,
+      },
     });
     return response.status(200).json({ success: true, data: tickets });
   } catch (e) {
@@ -296,7 +296,7 @@ export const deleteTicket = async (
   response: Response
 ): Promise<any> => {
   try {
-    const id = request.params.id
+    const id = request.params.id;
 
     const ticket = await prisma.ticket.findUnique({
       where: {
@@ -313,18 +313,17 @@ export const deleteTicket = async (
     await prisma.ticket.update({
       where: { id: ticket.id },
       data: {
-        deleted: true
-      }
-    })
+        deleted: true,
+      },
+    });
 
-    return response.status(200).json({ success: true, message: 'Le ticket a était supprimer' });
-
-
+    return response
+      .status(200)
+      .json({ success: true, message: 'Le ticket a était supprimer' });
   } catch (error) {
     return response.status(500).json({
       success: false,
-      message:
-        'Une erreur est survenue lors de la suppression du ticket',
+      message: 'Une erreur est survenue lors de la suppression du ticket',
     });
   }
-}
+};
