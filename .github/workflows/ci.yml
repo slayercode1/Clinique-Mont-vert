@@ -1,8 +1,8 @@
 name: Node.js CI
 
 on:
-  pull_request:
-    branches: [ dev ]
+  push:
+    branches: [ test ]
 
 jobs:
   container-job:
@@ -25,9 +25,6 @@ jobs:
           --health-retries 5
 
     steps:
-      - name: Checkout code
-      - uses: actions/checkout@v4
-
       # Installer les dépendances et exécuter les commandes pour le backend
       - name: Install and Test Backend
         working-directory: ./cmv-backend
