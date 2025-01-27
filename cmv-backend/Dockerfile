@@ -16,6 +16,8 @@ COPY ./dist ./dist
 
 COPY ./prisma ./prisma
 
+COPY ./views ./views
+
 RUN npx prisma generate
 
 # Expose the port that the application listens on
