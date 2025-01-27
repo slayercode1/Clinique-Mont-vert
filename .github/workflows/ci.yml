@@ -26,6 +26,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+      - name: Install OpenSSL
+        run: apt-get update -y && apt-get install -y openssl
       # Installer les dépendances et exécuter les commandes pour le backend
       - name: Install and Test Backend
         working-directory: cmv-backend
