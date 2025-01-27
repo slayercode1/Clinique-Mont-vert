@@ -27,7 +27,7 @@ jobs:
     steps:
       # Installer les dépendances et exécuter les commandes pour le backend
       - name: Install and Test Backend
-        working-directory: ./cmv-backend
+        working-directory: ../../cmv-backend
         env:
           DATABASE_URL: postgresql://test:test@localhost:5432/test_db
         run: |
