@@ -26,7 +26,6 @@ services:
       - NET_ADMIN
     ports:
       - "80:80"
-      - "8000:8000"
       - "443:443"
     volumes:
       - $PWD/conf:/etc/caddy
