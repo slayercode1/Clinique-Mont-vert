@@ -1,6 +1,6 @@
 # Clinique Mont-Vert
 
-Ce projet consiste à réaliser une partie d'une applications pour un clique fictif dans le cadre d'un formation pour améliorer la communication.
+Ce projet consiste à réaliser une partie d'une applications pour un clique fictif dans le cadre d'une formation pour améliorer la communication.
 
 ## Technologie utiliser
 
