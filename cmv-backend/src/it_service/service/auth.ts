@@ -132,9 +132,10 @@ export const changePassword = async (
   response: Response
 ): Promise<any> => {
   try {
-    const { userId, password } = request.body as {
+    const { userId, password, isChangePassword } = request.body as {
       userId: string;
       password: string;
+      isChangePassword: boolean;
     };
 
     const user = await prisma.user.findUnique({
@@ -150,6 +151,7 @@ export const changePassword = async (
       where: { id: user.id },
       data: {
         password: passwordHash,
+        isChangePassword: isChangePassword,
       },
     });
     return response.status(200).json({
