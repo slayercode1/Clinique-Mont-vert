@@ -19,6 +19,12 @@ import FormEditDialog from './FormEditDialog.vue';
 
 const resource = resourceStore();
 
+const dateFormatter = new Intl.DateTimeFormat('fr-FR', {
+  year: 'numeric',
+  month: 'long',
+  day: '2-digit',
+});
+
 const showAddDialog = ref(false);
 const showEditDialog = ref(false);
 const selectedResourceId = ref<string | null>(null);
@@ -39,12 +45,10 @@ const openEditDialog = (id: string) => {
 const closeEditDialog = () => {
   showEditDialog.value = false;
   selectedResourceId.value = null;
-  resource.fetchResources();
 };
 
 const closeAddDialog = () => {
   showAddDialog.value = false;
-  resource.fetchResources();
 };
 
 const columns: ColumnDef<Resource>[] = [
@@ -181,11 +185,7 @@ const columns: ColumnDef<Resource>[] = [
       return h(
         'div',
         { class: 'font-medium' },
-        new Intl.DateTimeFormat('fr-FR', {
-          year: 'numeric',
-          month: 'long',
-          day: '2-digit',
-        }).format(new Date(row.getValue('purchase_date')))
+        dateFormatter.format(new Date(row.getValue('purchase_date')))
       );
     },
   },
@@ -221,11 +221,7 @@ const columns: ColumnDef<Resource>[] = [
       return h(
         'div',
         { class: 'font-medium' },
-        new Intl.DateTimeFormat('fr-FR', {
-          year: 'numeric',
-          month: 'long',
-          day: '2-digit',
-        }).format(new Date(row.getValue('expired_at')))
+        dateFormatter.format(new Date(row.getValue('expired_at')))
       );
     },
   },

@@ -34,69 +34,65 @@ const routes = [
     path: '/change-password',
     component: ChangePasswordView,
     meta: {
+      requiresAuth: true,
       requiresRoles: ['IT_USER', 'IT_ADMIN', 'FLEET_USER', 'FLEET_ADMIN', 'SuperAdmin'],
     },
   },
   {
     path: '/settings',
     component: PermissionsView,
-    meta: {
-      requiresRoles: ['SuperAdmin'],
-    },
+    meta: { requiresAuth: true, requiresRoles: ['SuperAdmin'] },
   },
   {
     path: '/roles',
     component: RolesView,
-    meta: {
-      requiresRoles: ['SuperAdmin'],
-    },
+    meta: { requiresAuth: true, requiresRoles: ['SuperAdmin'] },
   },
   {
     path: '/services',
     component: ServicesView,
-    meta: {
-      requiresRoles: ['SuperAdmin'],
-    },
+    meta: { requiresAuth: true, requiresRoles: ['SuperAdmin'] },
   },
   {
     path: '/users-list',
     component: ListUserView,
-    meta: { requiresRoles: ['IT_USER', 'IT_ADMIN', 'SuperAdmin'] },
+    meta: { requiresAuth: true, requiresRoles: ['IT_USER', 'IT_ADMIN', 'SuperAdmin'] },
   },
   {
     path: '/user-add',
     component: FormAddUserView,
-    meta: { requiresRoles: ['IT_ADMIN', 'SuperAdmin'] },
+    meta: { requiresAuth: true, requiresRoles: ['IT_ADMIN', 'SuperAdmin'] },
   },
   {
     path: '/user-update/:id',
     component: FormEditUserView,
-    meta: { requiresRoles: ['IT_USER', 'IT_ADMIN', 'SuperAdmin'] },
+    meta: { requiresAuth: true, requiresRoles: ['IT_ADMIN', 'SuperAdmin'] },
   },
   {
     path: '/resources-list',
     component: ListResourceView,
-    meta: { requiresRoles: ['IT_USER', 'IT_ADMIN', 'SuperAdmin'] },
+    meta: { requiresAuth: true, requiresRoles: ['IT_USER', 'IT_ADMIN', 'SuperAdmin'] },
   },
   {
     path: '/resource-add',
     component: FormAddResourceView,
-    meta: { requiresRoles: ['IT_ADMIN', 'SuperAdmin'] },
+    meta: { requiresAuth: true, requiresRoles: ['IT_ADMIN', 'SuperAdmin'] },
   },
   {
     path: '/resource-update/:id',
     component: FormEditResourceView,
-    meta: { requiresRoles: ['IT_USER', 'IT_ADMIN', 'SuperAdmin'] },
+    meta: { requiresAuth: true, requiresRoles: ['IT_ADMIN', 'SuperAdmin'] },
   },
   {
     path: '/tickets-list',
     component: ListTicketView,
-    meta: { requiresRoles: ['IT_USER', 'IT_ADMIN', 'SuperAdmin'] },
+    meta: { requiresAuth: true, requiresRoles: ['IT_USER', 'IT_ADMIN', 'SuperAdmin'] },
   },
   {
     path: '/ticket-add',
     component: FormsTicketView,
     meta: {
+      requiresAuth: true,
       requiresRoles: ['IT_ADMIN', 'FLEET_USER', 'FLEET_ADMIN', 'SuperAdmin'],
     },
   },
@@ -104,37 +100,39 @@ const routes = [
     path: '/ticket/:id',
     component: TicketDetailView,
     meta: {
+      requiresAuth: true,
       requiresRoles: ['IT_USER', 'IT_ADMIN', 'FLEET_USER', 'FLEET_ADMIN', 'SuperAdmin'],
     },
   },
   {
     path: '/fleets-list',
     component: ListFleetView,
-    meta: { requiresRoles: ['FLEET_USER', 'FLEET_ADMIN', 'SuperAdmin'] },
+    meta: { requiresAuth: true, requiresRoles: ['FLEET_USER', 'FLEET_ADMIN', 'SuperAdmin'] },
   },
   {
     path: '/costs-list/:id',
     component: ListFleetDetailView,
     meta: {
+      requiresAuth: true,
       requiresRoles: ['FLEET_USER', 'FLEET_ADMIN', 'SuperAdmin'],
     },
     children: [
       {
         path: 'cost-add',
         component: ListFleetDetailView,
-        meta: { requiresRoles: ['FLEET_ADMIN', 'SuperAdmin'] },
+        meta: { requiresAuth: true, requiresRoles: ['FLEET_ADMIN', 'SuperAdmin'] },
       },
     ],
   },
   {
     path: '/fleet-add',
     component: FormAddFleetView,
-    meta: { requiresRoles: ['FLEET_ADMIN', 'SuperAdmin'] },
+    meta: { requiresAuth: true, requiresRoles: ['FLEET_ADMIN', 'SuperAdmin'] },
   },
   {
     path: '/fleet-update/:id',
     component: FormEditFleetView,
-    meta: { requiresRoles: ['FLEET_USER', 'FLEET_ADMIN', 'SuperAdmin'] },
+    meta: { requiresAuth: true, requiresRoles: ['FLEET_USER', 'FLEET_ADMIN', 'SuperAdmin'] },
   },
   { path: '/forbidden', component: ForbiddenView },
   { path: '/:pathMatch(.*)*', component: NotFoundView },
@@ -145,57 +143,45 @@ const router = createRouter({
   routes,
 });
 
+let lastSessionCheck = 0;
+const SESSION_TTL = 60_000; // 1 minute cache
+
 router.beforeEach(async (to: RouteLocationNormalized, _: RouteLocationNormalized) => {
   const isAuth = useTokenStore();
   const session = authStore();
+
   if (isAuth.getIsAuthenticated) {
-    await session.session();
-  }
-
-  const authRequiredPaths = [
-    '/users-list',
-    '/user-add',
-    '/user-update/:id',
-    '/change-password',
-    '/resources-list',
-    '/resource-add',
-    '/tickets-list',
-    '/ticket-add',
-    '/fleets-list',
-    '/fleet-add',
-    '/fleet-update/:id',
-    '/tickets/:id',
-    '/costs-list/:id',
-    '/costs-list/:id/cost-add',
-  ];
-
-  function isDynamicRoute(pattern: string, path: string) {
-    const regex = new RegExp(pattern.replace(/:\w+/g, '\\w+'));
-    return regex.test(path);
-  }
-
-  function isPathProtected(path: string) {
-    return authRequiredPaths.some((pattern) => {
-      return isDynamicRoute(pattern, path) || pattern === path;
-    });
+    const now = Date.now();
+    if (!session.getUser || now - lastSessionCheck > SESSION_TTL) {
+      try {
+        await session.session();
+        lastSessionCheck = now;
+      } catch {
+        lastSessionCheck = 0;
+        isAuth.logout();
+        return '/';
+      }
+    }
   }
 
   const redirectByRole = () => {
     const roleName = session.getUser?.role.name || '';
-    if (roleName.startsWith('IT')) return '/users-list';
+    if (roleName.startsWith('IT') || roleName === 'SuperAdmin') return '/users-list';
     if (roleName.startsWith('FLEET')) return '/fleets-list';
-    if (roleName === 'SuperAdmin') return '/users-list';
     return '/forbidden';
   };
 
-  if (!isAuth.getIsAuthenticated && isPathProtected(to.path)) {
+  // Route protégée sans authentification → login
+  if (to.meta.requiresAuth && !isAuth.getIsAuthenticated) {
     return '/';
   }
 
+  // Utilisateur connecté qui va sur login → redirect
   if (isAuth.getIsAuthenticated && to.path === '/') {
     return redirectByRole();
   }
 
+  // Vérification des rôles
   if (to.meta.requiresRoles) {
     const allowedRoles = to.meta.requiresRoles as string[];
     const userRole = session.getUser?.role.name as string;
@@ -205,13 +191,26 @@ router.beforeEach(async (to: RouteLocationNormalized, _: RouteLocationNormalized
   }
 
   const isChangePassword = session.getUser?.isChangePassword;
+  const isSuperAdmin = session.getUser?.role.name === 'SuperAdmin';
+
+  // L'utilisateur a déjà changé son mot de passe → ne pas accéder à /change-password
   if (isChangePassword && to.path === '/change-password') {
     return redirectByRole();
+  }
+
+  // L'utilisateur n'a pas encore changé son mot de passe → forcer (sauf SuperAdmin)
+  if (
+    isAuth.getIsAuthenticated &&
+    !isChangePassword &&
+    !isSuperAdmin &&
+    to.path !== '/change-password'
+  ) {
+    return '/change-password';
   }
 });
 
 const pinia = createPinia();
 const app = createApp(App);
-app.use(router);
 app.use(pinia);
+app.use(router);
 app.mount('#app');

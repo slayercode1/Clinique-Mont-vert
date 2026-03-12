@@ -15,7 +15,7 @@ export const getTickets = async (_: Request, response: Response): Promise<any> =
       where: { deleted: false },
     });
     const payload = { success: true, data: tickets };
-    await setCache('tickets', payload, 60); // 1 minute — données dynamiques
+    await setCache('tickets', payload, 60);
     return response.status(200).json(payload);
   } catch (_e) {
     return response.status(500).json({
@@ -29,28 +29,27 @@ export const getTicket = async (request: Request, response: Response): Promise<a
   const id = request.params.id;
   try {
     const ticket = await prisma.ticket.findUnique({
-      where: {
-        id,
-      },
+      where: { id },
       include: {
         material: true,
         employee: true,
         resolvedBy: true,
         assign: true,
+        service: true,
       },
     });
 
     if (!ticket)
       return response.status(404).json({
         success: false,
-        message: "La tâche n'a pas était trouver ",
+        message: "Le ticket n'a pas été trouvé",
       });
 
     return response.status(200).json({ success: true, data: ticket });
   } catch (_e) {
     return response.status(500).json({
       success: false,
-      message: 'Une erreur est survenue lors de la récupération des tickets',
+      message: 'Une erreur est survenue lors de la récupération du ticket',
     });
   }
 };
@@ -78,12 +77,8 @@ export const createTicket = async (request: Request, response: Response): Promis
     });
 
     await prisma.material.update({
-      where: {
-        id: body.materialId,
-      },
-      data: {
-        ticketId: newTicket.id,
-      },
+      where: { id: body.materialId },
+      data: { ticketId: newTicket.id },
     });
 
     await invalidateCache('tickets');
@@ -91,7 +86,7 @@ export const createTicket = async (request: Request, response: Response): Promis
   } catch (_e) {
     return response.status(500).json({
       success: false,
-      message: 'Une erreur est survenue lors de la creation du ticket',
+      message: 'Une erreur est survenue lors de la création du ticket',
     });
   }
 };
@@ -101,25 +96,19 @@ export const updateTicket = async (request: Request, response: Response): Promis
   try {
     const body = request.body as Partial<TicketType>;
 
-    const ticket = await prisma.ticket.findUnique({
-      where: {
-        id,
-      },
-    });
+    const ticket = await prisma.ticket.findUnique({ where: { id } });
 
     if (!ticket)
       return response.status(404).json({
         success: false,
-        message: "La taâche n'a pas etait trouver ",
+        message: "Le ticket n'a pas été trouvé",
       });
 
     switch (body.status) {
       case 'IN_VALIDATE':
         return prisma.ticket
           .update({
-            where: {
-              id: ticket.id,
-            },
+            where: { id: ticket.id },
             data: {
               status: body.status,
               priority: body.priority,
@@ -130,20 +119,14 @@ export const updateTicket = async (request: Request, response: Response): Promis
               assignId: body.assignId,
               validated_at: body.validated_at,
             },
-            include: {
-              employee: true,
-              resolvedBy: true,
-              material: true,
-              assign: true,
-            },
+            include: { employee: true, resolvedBy: true, material: true, assign: true },
           })
           .then((data) => {
             sendemail(
               'task-completed-client-notification.edge',
               data,
               data.employee.email,
-              'Tâche terminée - En attente de votre validation',
-              response
+              'Tâche terminée - En attente de votre validation'
             );
             return response.status(200).json({ success: true, data });
           });
@@ -151,9 +134,7 @@ export const updateTicket = async (request: Request, response: Response): Promis
       case 'VALIDE':
         return prisma.ticket
           .update({
-            where: {
-              id: ticket.id,
-            },
+            where: { id: ticket.id },
             data: {
               status: 'CLOSED',
               priority: body.priority,
@@ -161,19 +142,14 @@ export const updateTicket = async (request: Request, response: Response): Promis
               employeeId: body.employeeId,
               decription: body.description,
             },
-            include: {
-              employee: true,
-              resolvedBy: true,
-              material: true,
-            },
+            include: { employee: true, resolvedBy: true, material: true },
           })
           .then((data) => {
             sendemail(
               'client-task-approval-status.edge',
               data,
               data.resolvedBy?.email,
-              ' Statut de la tâche - Validée  par le client',
-              response
+              'Statut de la tâche - Validée par le client'
             );
             return response.status(200).json({ success: true, data });
           });
@@ -181,9 +157,7 @@ export const updateTicket = async (request: Request, response: Response): Promis
       case 'NOT_VALIDATE':
         return prisma.ticket
           .update({
-            where: {
-              id: ticket.id,
-            },
+            where: { id: ticket.id },
             data: {
               status: 'IN_PROGRESS',
               priority: body.priority,
@@ -192,28 +166,21 @@ export const updateTicket = async (request: Request, response: Response): Promis
               decription: body.description,
               resolvedById: null,
             },
-            include: {
-              employee: true,
-              resolvedBy: true,
-              material: true,
-            },
+            include: { employee: true, resolvedBy: true, material: true },
           })
           .then((data) => {
             sendemail(
               'client-task-approval-status.edge',
               data,
               data.resolvedBy?.email,
-              ' Statut de la tâche - Refusée par le client',
-              response
+              'Statut de la tâche - Refusée par le client'
             );
             return response.status(200).json({ success: true, data });
           });
 
       default: {
         const update = await prisma.ticket.update({
-          where: {
-            id: ticket.id,
-          },
+          where: { id: ticket.id },
           data: {
             status: body.status,
             priority: body.priority,
@@ -223,11 +190,7 @@ export const updateTicket = async (request: Request, response: Response): Promis
             resolvedById: null,
             validated_at: null,
           },
-          include: {
-            employee: true,
-            resolvedBy: true,
-            material: true,
-          },
+          include: { employee: true, resolvedBy: true, material: true },
         });
         await invalidateCache('tickets', `ticket:${id}`);
         return response.status(200).json({ success: true, data: update });
@@ -241,71 +204,38 @@ export const updateTicket = async (request: Request, response: Response): Promis
   }
 };
 
-export async function sendemail(
-  template: string,
-  data: any,
-  to: string,
-  subject: string,
-  response: Response
-) {
+export async function sendemail(template: string, data: any, to: string, subject: string) {
   try {
     const html = await render(template, data);
-
-    const mailOptions = {
-      from: 'cliniquemontvert-itservice@gmail.com',
-      to: to,
-      subject,
-      html,
-    };
-
-    // Use a Promise-based approach to handle email sending
     await new Promise<void>((resolve, reject) => {
-      transporter.sendMail(mailOptions, (error: Error | null) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve();
-        }
-      });
+      transporter.sendMail(
+        { from: process.env.EMAIL || 'noreply@cmv.re', to, subject, html },
+        (error: Error | null) => (error ? reject(error) : resolve())
+      );
     });
-
-    // Send success response only if email is sent successfully
-    response.status(200).json({ success: true, message: 'Email sent' });
-  } catch (err) {
-    // Send error response only if not already sent
-    if (!response.headersSent) {
-      response.status(500).json({
-        error: err instanceof Error ? err.message : 'Internal server error',
-      });
-    }
+  } catch {
+    // L'envoi d'email ne doit pas bloquer l'opération principale
   }
 }
 
 export const deleteTicket = async (request: Request, response: Response): Promise<any> => {
   try {
     const id = request.params.id;
-
-    const ticket = await prisma.ticket.findUnique({
-      where: {
-        id: id,
-      },
-    });
+    const ticket = await prisma.ticket.findUnique({ where: { id } });
 
     if (!ticket)
       return response.status(404).json({
         success: false,
-        message: "Le ticket n'a pas etait trouver ",
+        message: "Le ticket n'a pas été trouvé",
       });
 
     await prisma.ticket.update({
       where: { id: ticket.id },
-      data: {
-        deleted: true,
-      },
+      data: { deleted: true },
     });
 
     await invalidateCache('tickets', `ticket:${id}`);
-    return response.status(200).json({ success: true, message: 'Le ticket a était supprimer' });
+    return response.status(200).json({ success: true, message: 'Le ticket a été supprimé' });
   } catch (_error) {
     return response.status(500).json({
       success: false,

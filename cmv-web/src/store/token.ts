@@ -11,26 +11,22 @@ export const useTokenStore = defineStore('token', {
   }),
 
   getters: {
-    // Getter pour vérifier si l'utilisateur est authentifié
     getIsAuthenticated(): boolean {
       return this.isAuthenticated;
     },
   },
 
   actions: {
-    // Vérifie le token au démarrage
     initializeAuth() {
       const token = localStorage.getItem(STORAGE_KEY);
       this.isAuthenticated = token !== null;
     },
 
-    // Se connecter
     login(token: string) {
       localStorage.setItem(STORAGE_KEY, token);
       this.isAuthenticated = true;
     },
 
-    // Se déconnecter
     logout() {
       localStorage.removeItem(STORAGE_KEY);
       this.isAuthenticated = false;

@@ -5,11 +5,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const sampleTicket: Ticket = {
   id: 'ticket-1',
   status: 'TODO',
-  priority: 'HIGH',
+  priority: 'HIGT',
   created_at: '2024-01-01T00:00:00.000Z',
   validated_at: null,
   employeeId: 'emp-1',
-  description: 'Fix printer',
+  decription: 'Fix printer',
   service: 'IT',
   resolvedById: '',
   material: [],
@@ -46,6 +46,7 @@ const sampleTicket: Ticket = {
 function mockFetchOk(data: unknown) {
   (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
     ok: true,
+    status: 200,
     json: async () => data,
   });
 }
@@ -53,6 +54,7 @@ function mockFetchOk(data: unknown) {
 function mockFetchFail(data: unknown) {
   (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
     ok: false,
+    status: 400,
     json: async () => data,
   });
 }
@@ -72,14 +74,15 @@ describe('ticketStore', () => {
       expect(store.tickets).toEqual([sampleTicket]);
     });
 
-    it('does not throw on fetch error', async () => {
+    it('throws on fetch error', async () => {
       (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: false,
+        status: 500,
         statusText: 'Server Error',
         json: async () => ({}),
       });
       const store = ticketStore();
-      await expect(store.fetchTickets()).resolves.not.toThrow();
+      await expect(store.fetchTickets()).rejects.toThrow('Server Error');
     });
   });
 

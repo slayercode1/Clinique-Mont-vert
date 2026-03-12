@@ -18,6 +18,7 @@ const sampleUser: User = {
 function mockFetchOk(data: unknown) {
   (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
     ok: true,
+    status: 200,
     json: async () => data,
   });
 }
@@ -25,6 +26,7 @@ function mockFetchOk(data: unknown) {
 function mockFetchFail(data: unknown) {
   (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
     ok: false,
+    status: 400,
     json: async () => data,
   });
 }
@@ -44,10 +46,10 @@ describe('userStore', () => {
       expect(store.users).toEqual([sampleUser]);
     });
 
-    it('does not throw on fetch error', async () => {
+    it('throws on fetch error', async () => {
       (global.fetch as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error('Network error'));
       const store = userStore();
-      await expect(store.fetchUsers()).resolves.not.toThrow();
+      await expect(store.fetchUsers()).rejects.toThrow('Network error');
     });
   });
 
@@ -91,6 +93,7 @@ describe('userStore', () => {
     it('removes user from store on success', async () => {
       (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
+        status: 200,
         json: async () => ({}),
       });
       const store = userStore();
@@ -103,6 +106,7 @@ describe('userStore', () => {
     it('does not modify store on failure', async () => {
       (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: false,
+        status: 400,
         statusText: 'Server Error',
         json: async () => ({}),
       });
@@ -125,10 +129,10 @@ describe('userStore', () => {
       expect(store.roles).toEqual(roles);
     });
 
-    it('does not throw on error', async () => {
+    it('throws on error', async () => {
       (global.fetch as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error('Network error'));
       const store = userStore();
-      await expect(store.fetchRoles()).resolves.not.toThrow();
+      await expect(store.fetchRoles()).rejects.toThrow('Network error');
     });
   });
 

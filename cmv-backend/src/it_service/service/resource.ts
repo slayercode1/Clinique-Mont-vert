@@ -3,7 +3,7 @@ import { getCache, invalidateCache, setCache } from '../../utils/cache.js';
 import prisma from '../../utils/prisma.js';
 import type { ResourceType } from '../../utils/types/index.js';
 
-const TTL = 300; // 5 minutes
+const TTL = 300;
 
 export const getResources = async (_: Request, response: Response): Promise<any> => {
   try {
@@ -30,9 +30,10 @@ export const getResource = async (request: Request, response: Response): Promise
 
     const resource = await prisma.material.findUnique({ where: { id } });
     if (!resource) {
-      return response
-        .status(404)
-        .json({ success: false, message: "La resource n'a pas était trouver" });
+      return response.status(404).json({
+        success: false,
+        message: "La ressource n'a pas été trouvée",
+      });
     }
 
     const payload = { success: true, data: resource };
@@ -41,7 +42,7 @@ export const getResource = async (request: Request, response: Response): Promise
   } catch (_e) {
     return response.status(500).json({
       success: false,
-      message: 'Une erreur est survenue lors de la récupération de la resource',
+      message: 'Une erreur est survenue lors de la récupération de la ressource',
     });
   }
 };
@@ -66,7 +67,7 @@ export const createResource = async (request: Request, response: Response): Prom
   } catch (_e) {
     return response.status(500).json({
       success: false,
-      message: 'Une erreur est survenue lors de la creation de la ressource',
+      message: 'Une erreur est survenue lors de la création de la ressource',
     });
   }
 };
@@ -75,24 +76,24 @@ export const updateResource = async (request: Request, response: Response): Prom
   const id = request.params.id;
   try {
     const body = request.body as Partial<ResourceType>;
-    const resource = await prisma.material.findUnique({
-      where: {
-        id,
-      },
-    });
+    const resource = await prisma.material.findUnique({ where: { id } });
 
     if (!resource)
       return response.status(404).json({
         success: false,
-        message: "La ressource n'a pas etait trouver ",
+        message: "La ressource n'a pas été trouvée",
       });
 
     const resourceUpdate = await prisma.material.update({
-      where: {
-        id: resource.id,
-      },
+      where: { id: resource.id },
       data: {
-        ...body,
+        type: body.type,
+        resource: body.resource,
+        location: body.location,
+        purchase_date: body.purchase_date,
+        supplier: body.supplier,
+        expired_at: body.expired_at,
+        state: body.state,
       },
     });
 
@@ -101,7 +102,7 @@ export const updateResource = async (request: Request, response: Response): Prom
   } catch (_e) {
     return response.status(500).json({
       success: false,
-      message: `Une erreur est survenue lors de la modification de la ressource ${id}`,
+      message: 'Une erreur est survenue lors de la modification de la ressource',
     });
   }
 };
@@ -109,28 +110,21 @@ export const updateResource = async (request: Request, response: Response): Prom
 export const deleteResouce = async (request: Request, response: Response): Promise<any> => {
   try {
     const id = request.params.id;
-
-    const material = await prisma.material.findUnique({
-      where: {
-        id: id,
-      },
-    });
+    const material = await prisma.material.findUnique({ where: { id } });
 
     if (!material)
       return response.status(404).json({
         success: false,
-        message: "La ressource n'a pas etait trouver ",
+        message: "La ressource n'a pas été trouvée",
       });
 
     await prisma.material.update({
       where: { id: material.id },
-      data: {
-        deleted: true,
-      },
+      data: { deleted: true },
     });
 
     await invalidateCache('resources', `resource:${id}`);
-    return response.status(200).json({ success: true, message: 'La ressource a était supprimer' });
+    return response.status(200).json({ success: true, message: 'La ressource a été supprimée' });
   } catch (_error) {
     return response.status(500).json({
       success: false,

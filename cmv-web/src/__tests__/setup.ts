@@ -1,6 +1,5 @@
 import { vi } from 'vitest';
 
-// Mock localStorage
 const localStorageMock = (() => {
   let store: Record<string, string> = {};
   return {
@@ -18,5 +17,4 @@ const localStorageMock = (() => {
 })();
 Object.defineProperty(global, 'localStorage', { value: localStorageMock });
 
-// Mock fetch globally
 global.fetch = vi.fn();

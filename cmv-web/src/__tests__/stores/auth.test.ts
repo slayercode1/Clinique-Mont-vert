@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 function mockFetchOk(data: unknown) {
   (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
     ok: true,
+    status: 200,
     json: async () => data,
   });
 }
@@ -12,6 +13,7 @@ function mockFetchOk(data: unknown) {
 function mockFetchFail(data: unknown) {
   (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
     ok: false,
+    status: 400,
     json: async () => data,
   });
 }
@@ -78,15 +80,16 @@ describe('authStore', () => {
   });
 
   describe('signout', () => {
-    it('calls fetch with the user id in URL', async () => {
+    it('calls fetch without user id in URL', async () => {
       (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
+        status: 200,
         json: async () => ({}),
       });
       const store = authStore();
-      await store.signout('user-1');
+      await store.signout();
       expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining('/it/sign-out/user-1'),
+        expect.stringContaining('/it/sign-out'),
         expect.objectContaining({ method: 'POST' })
       );
     });

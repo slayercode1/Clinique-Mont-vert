@@ -1,4 +1,4 @@
-import { STORAGE_KEY } from '@/utils/storage';
+import { authFetch } from '@/utils/storage';
 import { defineStore } from 'pinia';
 import { API_ENDPOINT } from './api-endpoint';
 
@@ -31,48 +31,22 @@ export const resourceStore = defineStore('resource', {
   },
   actions: {
     async fetchResources() {
-      try {
-        const response = await fetch(`${API_ENDPOINT}/it/resources`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem(STORAGE_KEY)}`,
-            'Content-Type': 'application/json', // optional, depending on the API requirements
-          },
-        });
-        if (!response.ok) {
-          throw new Error(response.statusText);
-        }
-        const { data } = await response.json();
-        this.resources = data;
-      } catch (error) {
-        console.error('Error fetching resources:', error);
-      }
+      const response = await authFetch(`${API_ENDPOINT}/it/resources`);
+      if (!response.ok) throw new Error(response.statusText);
+      const { data } = await response.json();
+      this.resources = data;
     },
 
     async fetchResource(id: string) {
-      try {
-        const response = await fetch(`${API_ENDPOINT}/it/resource/${id}`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem(STORAGE_KEY)}`,
-            'Content-Type': 'application/json', // optional, depending on the API requirements
-          },
-        });
-        if (!response.ok) {
-          throw new Error(response.statusText);
-        }
-        const { data } = await response.json();
-        this.resource = data;
-      } catch (error) {
-        console.error('Error fetching resources:', error);
-      }
+      const response = await authFetch(`${API_ENDPOINT}/it/resource/${id}`);
+      if (!response.ok) throw new Error(response.statusText);
+      const { data } = await response.json();
+      this.resource = data;
     },
 
     async createResource(resource: Resource) {
-      const response = await fetch(`${API_ENDPOINT}/it/resource`, {
+      const response = await authFetch(`${API_ENDPOINT}/it/resource`, {
         method: 'POST',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem(STORAGE_KEY)}`,
-          'Content-Type': 'application/json', // optional, depending on the API requirements
-        },
         body: JSON.stringify(resource),
       });
       if (!response.ok) {
@@ -85,12 +59,8 @@ export const resourceStore = defineStore('resource', {
     },
 
     async updateResource(resource: unknown, id: string) {
-      const response = await fetch(`${API_ENDPOINT}/it/resource/${id}`, {
+      const response = await authFetch(`${API_ENDPOINT}/it/resource/${id}`, {
         method: 'PATCH',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem(STORAGE_KEY)}`,
-          'Content-Type': 'application/json', // optional, depending on the API requirements
-        },
         body: JSON.stringify(resource),
       });
       if (!response.ok) {
@@ -98,23 +68,14 @@ export const resourceStore = defineStore('resource', {
         throw new Error(data.message);
       }
       const { data } = await response.json();
-      this.resources = this.resources.map((resource: Resource) =>
-        resource.id === data.id ? data : resource
-      );
+      this.resources = this.resources.map((r: Resource) => (r.id === data.id ? data : r));
       return data;
     },
 
     async deleteResource(id: string) {
-      const response = await fetch(`${API_ENDPOINT}/it/delete-resource/${id}`, {
+      await authFetch(`${API_ENDPOINT}/it/delete-resource/${id}`, {
         method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem(STORAGE_KEY)}`,
-          'Content-Type': 'application/json',
-        },
       });
-      if (!response.ok) {
-        console.error('Error deleting resource:', response.statusText);
-      }
     },
   },
 });

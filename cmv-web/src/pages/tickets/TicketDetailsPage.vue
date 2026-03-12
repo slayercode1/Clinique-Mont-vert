@@ -19,7 +19,7 @@ const ticket_store = ticketStore();
 const route = useRoute();
 
 const priorityStyles = {
-  HIGH: 'bg-red-600 text-white',
+  HIGT: 'bg-red-600 text-white',
   MEDIUM: 'bg-yellow-500 text-white',
   LOW: 'bg-green-500 text-white',
 };
@@ -67,7 +67,7 @@ const stats = [
           <CardTitle class="text-2xl font-bold"
             >Ticket n°: {{ ticket_store.getTicket?.id }}</CardTitle
           >
-          <CardDescription class="mt-2">{{ ticket_store.getTicket?.description }}</CardDescription>
+          <CardDescription class="mt-2">{{ ticket_store.getTicket?.decription }}</CardDescription>
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger as-child class="cursor-pointer">
@@ -109,7 +109,7 @@ const stats = [
 
           <!-- Service -->
           <div class="flex items-center space-x-2">
-            <span>Service : {{ ticket_store.getTicket?.service }}</span>
+            <span>Service : {{ ticket_store.getTicket?.service?.name ?? '--' }}</span>
           </div>
 
           <!-- Priorité -->

@@ -25,21 +25,16 @@ export const getVehicles = async (_: Request, response: Response): Promise<any> 
 export const getVehicle = async (request: Request, response: Response): Promise<any> => {
   try {
     const id = request.params.id;
-    const vehicle = await prisma.vehicle.findUnique({
-      where: { id: id },
-    });
+    const vehicle = await prisma.vehicle.findUnique({ where: { id } });
 
     if (!vehicle) {
       return response.status(404).json({
         success: false,
-        message: "Le véhicule n'a pas était trouver",
+        message: "Le véhicule n'a pas été trouvé",
       });
     }
 
-    return response.status(200).json({
-      success: true,
-      data: vehicle,
-    });
+    return response.status(200).json({ success: true, data: vehicle });
   } catch (_e) {
     return response.status(500).json({
       success: false,
@@ -51,29 +46,24 @@ export const getVehicle = async (request: Request, response: Response): Promise<
 export const getCost = async (request: Request, response: Response): Promise<any> => {
   try {
     const id = request.params.id;
-    const vehicleId = await prisma.vehicle.findUnique({
-      where: { id: id },
-    });
+    const vehicleExists = await prisma.vehicle.findUnique({ where: { id } });
 
-    if (!vehicleId) {
+    if (!vehicleExists) {
       return response.status(404).json({
         success: false,
-        message: "Le véhicule n'a pas était trouver ",
+        message: "Le véhicule n'a pas été trouvé",
       });
     }
 
-    const vehicle = await prisma.cost.findMany({
-      where: {
-        vehicleId: vehicleId?.id,
-        deleted: false,
-      },
+    const costs = await prisma.cost.findMany({
+      where: { vehicleId: vehicleExists.id, deleted: false },
     });
 
-    return response.status(200).json({ success: true, data: vehicle });
+    return response.status(200).json({ success: true, data: costs });
   } catch (_e) {
     return response.status(500).json({
       success: false,
-      message: 'Une erreur est survenue lors de la récupération du véhicule',
+      message: 'Une erreur est survenue lors de la récupération des coûts',
     });
   }
 };
@@ -97,7 +87,7 @@ export const createVehicle = async (request: Request, response: Response): Promi
   } catch (_e) {
     return response.status(500).json({
       success: false,
-      message: 'Une erreur est survenue lors de la creation du véhicule',
+      message: 'Une erreur est survenue lors de la création du véhicule',
     });
   }
 };
@@ -119,34 +109,32 @@ export const createCost = async (request: Request, response: Response): Promise<
   } catch (_e) {
     return response.status(500).json({
       success: false,
-      message: `Une erreur est survenue lors de la creation d' un coût `,
+      message: "Une erreur est survenue lors de la création d'un coût",
     });
   }
 };
 
 export const updateVehicle = async (request: Request, response: Response): Promise<any> => {
   const id = request.params.id;
-
   try {
     const body = request.body as Partial<VehicleType>;
-    const vehicle = await prisma.vehicle.findUnique({
-      where: {
-        id,
-      },
-    });
+    const vehicle = await prisma.vehicle.findUnique({ where: { id } });
 
     if (!vehicle)
       return response.status(404).json({
         success: false,
-        message: "Le véhicule n'a pas était trouver ",
+        message: "Le véhicule n'a pas été trouvé",
       });
 
     const vehicleUpdate = await prisma.vehicle.update({
-      where: {
-        id: vehicle.id,
-      },
+      where: { id: vehicle.id },
       data: {
-        ...body,
+        brand: body.brand,
+        model: body.model,
+        year: body.year,
+        state: body.state,
+        maintenance_date: body.maintenance_date,
+        kilometres: body.kilometres,
       },
     });
 
@@ -155,7 +143,7 @@ export const updateVehicle = async (request: Request, response: Response): Promi
   } catch (_e) {
     return response.status(500).json({
       success: false,
-      message: `Une erreur est survenue lors de la modification du véhicule ${id}`,
+      message: 'Une erreur est survenue lors de la modification du véhicule',
     });
   }
 };
@@ -163,32 +151,25 @@ export const updateVehicle = async (request: Request, response: Response): Promi
 export const deleteVehicle = async (request: Request, response: Response): Promise<any> => {
   try {
     const id = request.params.id;
-
-    const vehicle = await prisma.vehicle.findUnique({
-      where: {
-        id: id,
-      },
-    });
+    const vehicle = await prisma.vehicle.findUnique({ where: { id } });
 
     if (!vehicle)
       return response.status(404).json({
         success: false,
-        message: "Le véhicule n'a pas etait trouver ",
+        message: "Le véhicule n'a pas été trouvé",
       });
 
     await prisma.vehicle.update({
       where: { id: vehicle.id },
-      data: {
-        deleted: true,
-      },
+      data: { deleted: true },
     });
 
     await invalidateCache('vehicles', `vehicle:${id}`);
-    return response.status(200).json({ success: true, message: 'Le vehicle a était supprimer' });
+    return response.status(200).json({ success: true, message: 'Le véhicule a été supprimé' });
   } catch (_error) {
     return response.status(500).json({
       success: false,
-      message: 'Une erreur est survenue lors de la suppression du vehicule',
+      message: 'Une erreur est survenue lors de la suppression du véhicule',
     });
   }
 };
@@ -196,28 +177,21 @@ export const deleteVehicle = async (request: Request, response: Response): Promi
 export const deleteCost = async (request: Request, response: Response): Promise<any> => {
   try {
     const id = request.params.id;
-
-    const cost = await prisma.cost.findUnique({
-      where: {
-        id: id,
-      },
-    });
+    const cost = await prisma.cost.findUnique({ where: { id } });
 
     if (!cost)
       return response.status(404).json({
         success: false,
-        message: "Le coût n'a pas etait trouver ",
+        message: "Le coût n'a pas été trouvé",
       });
 
     await prisma.cost.update({
       where: { id: cost.id },
-      data: {
-        deleted: true,
-      },
+      data: { deleted: true },
     });
 
     await invalidateCache(`vehicle_cost:${cost.vehicleId}`);
-    return response.status(200).json({ success: true, message: 'Le coût a était supprimer' });
+    return response.status(200).json({ success: true, message: 'Le coût a été supprimé' });
   } catch (_error) {
     return response.status(500).json({
       success: false,

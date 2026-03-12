@@ -33,7 +33,7 @@ import {
 
 export const routes = Router();
 
-//USER
+// --- User ---
 routes.get('/users', [jwtErrorHandler, RBAC('read', 'user')], getUsers);
 routes.get('/user/:id', [jwtErrorHandler, RBAC('read', 'user')], getUser);
 routes.post(
@@ -62,13 +62,13 @@ routes.patch(
 );
 routes.delete('/delete-user/:id', [jwtErrorHandler, RBAC('delete', 'user')], deleteUser);
 
-//AUTH
+// --- Auth ---
 routes.post('/sign-in', validateData(signInSchema), signIn);
-routes.post('/sign-out/:id', [jwtErrorHandler], signOut);
-routes.patch('/change-password', [jwtErrorHandler, RBAC('edit', 'user')], changePassword);
-routes.get('/session', [jwtErrorHandler, RBAC('read', 'user')], getSession);
+routes.post('/sign-out', [jwtErrorHandler], signOut);
+routes.patch('/change-password', [jwtErrorHandler], changePassword);
+routes.get('/session', [jwtErrorHandler], getSession);
 
-//RESOURCE
+// --- Resource ---
 routes.get('/resources', [jwtErrorHandler, RBAC('read', 'resource')], getResources);
 routes.get('/resource/:id', [jwtErrorHandler, RBAC('read', 'resource')], getResource);
 routes.post(
@@ -83,7 +83,7 @@ routes.patch(
 );
 routes.delete('/delete-resource/:id', [jwtErrorHandler, RBAC('delete', 'resource')], deleteResouce);
 
-//TICKET
+// --- Ticket ---
 routes.get('/tickets', [jwtErrorHandler, RBAC('read', 'ticket')], getTickets);
 routes.get('/ticket/:id', [jwtErrorHandler, RBAC('edit', 'ticket_detail')], getTicket);
 routes.post(

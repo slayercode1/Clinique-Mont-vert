@@ -11,7 +11,7 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - caddy-net
+      - app-net
     restart: unless-stopped
 
   redis:
@@ -25,7 +25,7 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - caddy-net
+      - app-net
     restart: unless-stopped
 
   server:
@@ -39,19 +39,22 @@ services:
       redis:
         condition: service_healthy
     networks:
+      - app-net
       - caddy-net
     restart: unless-stopped
 
   web:
     build:
       context: ./cmv-web
-    networks:
-      - caddy-net
-    restart: unless-stopped
     depends_on:
       - server
+    networks:
+      - app-net
+      - caddy-net
+    restart: unless-stopped
 
 networks:
+  app-net:
   caddy-net:
     external: true
 

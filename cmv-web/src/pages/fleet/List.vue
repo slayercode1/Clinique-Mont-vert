@@ -20,6 +20,12 @@ import FormEditDialog from './FormEditDialog.vue';
 
 const vehicle = fleetStore();
 
+const dateFormatter = new Intl.DateTimeFormat('fr-FR', {
+  year: 'numeric',
+  month: 'long',
+  day: '2-digit',
+});
+
 const showAddDialog = ref(false);
 const showEditDialog = ref(false);
 const selectedVehicleId = ref<string | null>(null);
@@ -40,12 +46,10 @@ const openEditDialog = (id: string) => {
 const closeEditDialog = () => {
   showEditDialog.value = false;
   selectedVehicleId.value = null;
-  vehicle.fetchFleets();
 };
 
 const closeAddDialog = () => {
   showAddDialog.value = false;
-  vehicle.fetchFleets();
 };
 
 const columns: ColumnDef<VehicleType & { id?: string }>[] = [
@@ -198,11 +202,7 @@ const columns: ColumnDef<VehicleType & { id?: string }>[] = [
         'div',
         { class: 'font-medium' },
         row.getValue('maintenance_date') !== null
-          ? new Intl.DateTimeFormat('fr-FR', {
-              year: 'numeric',
-              month: 'long',
-              day: '2-digit',
-            }).format(new Date(row.getValue('maintenance_date')))
+          ? dateFormatter.format(new Date(row.getValue('maintenance_date')))
           : '--'
       );
     },

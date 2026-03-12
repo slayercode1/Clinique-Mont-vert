@@ -40,7 +40,7 @@ defineProps({
 });
 
 const handleLogout = async () => {
-  await session.signout(session.getUser?.id!);
+  await session.signout();
   token.logout();
   router.replace('/');
 };

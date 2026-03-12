@@ -10,6 +10,10 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
+    dedupe: ['vue', 'vue-sonner'],
+  },
+  optimizeDeps: {
+    include: ['vue-sonner'],
   },
   build: {
     target: 'esnext',
@@ -35,6 +39,10 @@ export default defineConfig({
   server: {
     port: 5173,
     host: true,
+    proxy: {
+      '/it': 'http://localhost:3000',
+      '/fleet': 'http://localhost:3000',
+    },
   },
   test: {
     environment: 'happy-dom',

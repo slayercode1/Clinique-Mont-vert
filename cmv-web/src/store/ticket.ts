@@ -1,4 +1,4 @@
-import { STORAGE_KEY } from '@/utils/storage';
+import { authFetch } from '@/utils/storage';
 import type { TicketType, UserType } from '@/utils/types';
 import { defineStore } from 'pinia';
 import { API_ENDPOINT } from './api-endpoint';
@@ -7,11 +7,11 @@ import type { Resource } from './resource';
 export interface Ticket {
   id: string;
   status: 'IN_PROGRESS' | 'TODO' | 'BLOCKED';
-  priority: 'HIGH' | 'MEDIUM' | 'LOW';
+  priority: 'HIGT' | 'MEDIUM' | 'LOW';
   created_at: string;
   validated_at: string | null;
   employeeId: string;
-  description: string;
+  decription: string;
   service: string;
   resolvedById: string;
   material: Resource[];
@@ -34,48 +34,22 @@ export const ticketStore = defineStore('ticket', {
   },
   actions: {
     async fetchTickets() {
-      try {
-        const response = await fetch(`${API_ENDPOINT}/it/tickets`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem(STORAGE_KEY)}`,
-            'Content-Type': 'application/json', // optional, depending on the API requirements
-          },
-        });
-        if (!response.ok) {
-          throw new Error(response.statusText);
-        }
-        const { data } = await response.json();
-        this.tickets = data;
-      } catch (error) {
-        console.error('Error fetching tickets:', error);
-      }
+      const response = await authFetch(`${API_ENDPOINT}/it/tickets`);
+      if (!response.ok) throw new Error(response.statusText);
+      const { data } = await response.json();
+      this.tickets = data;
     },
 
     async fetchTicket(id: string) {
-      try {
-        const response = await fetch(`${API_ENDPOINT}/it/ticket/${id}`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem(STORAGE_KEY)}`,
-            'Content-Type': 'application/json', // optional, depending on the API requirements
-          },
-        });
-        if (!response.ok) {
-          throw new Error(response.statusText);
-        }
-        const { data } = await response.json();
-        this.ticket = data;
-      } catch (error) {
-        console.error('Error fetching tickets:', error);
-      }
+      const response = await authFetch(`${API_ENDPOINT}/it/ticket/${id}`);
+      if (!response.ok) throw new Error(response.statusText);
+      const { data } = await response.json();
+      this.ticket = data;
     },
 
     async createTicket(ticket: TicketType) {
-      const response = await fetch(`${API_ENDPOINT}/it/ticket`, {
+      const response = await authFetch(`${API_ENDPOINT}/it/ticket`, {
         method: 'POST',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem(STORAGE_KEY)}`,
-          'Content-Type': 'application/json', // optional, depending on the API requirements
-        },
         body: JSON.stringify(ticket),
       });
       if (!response.ok) {
@@ -88,12 +62,8 @@ export const ticketStore = defineStore('ticket', {
     },
 
     async updateTicket(payload: unknown, id: string) {
-      const response = await fetch(`${API_ENDPOINT}/it/ticket/${id}`, {
+      const response = await authFetch(`${API_ENDPOINT}/it/ticket/${id}`, {
         method: 'PATCH',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem(STORAGE_KEY)}`,
-          'Content-Type': 'application/json', // optional, depending on the API requirements
-        },
         body: JSON.stringify(payload),
       });
       if (!response.ok) {
@@ -101,7 +71,7 @@ export const ticketStore = defineStore('ticket', {
         throw new Error(data.message);
       }
       const { data } = await response.json();
-      this.tickets = this.tickets.map((ticket: Ticket) => (ticket.id === data.id ? data : ticket));
+      this.tickets = this.tickets.map((t: Ticket) => (t.id === data.id ? data : t));
       if ((this.ticket as Ticket | undefined)?.id === id) {
         this.ticket = data;
       }
@@ -109,16 +79,9 @@ export const ticketStore = defineStore('ticket', {
     },
 
     async deleteTicket(id: string) {
-      const response = await fetch(`${API_ENDPOINT}/it/delete-ticket/${id}`, {
+      await authFetch(`${API_ENDPOINT}/it/delete-ticket/${id}`, {
         method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem(STORAGE_KEY)}`,
-          'Content-Type': 'application/json',
-        },
       });
-      if (!response.ok) {
-        console.error('Error deleting ticket:', response.statusText);
-      }
     },
   },
 });

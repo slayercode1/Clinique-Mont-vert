@@ -25,14 +25,14 @@ gateway.use(
     methods: ['GET', 'POST', 'PATCH', 'DELETE'],
   })
 );
-gateway.set('trust proxy', 'loopback, linklocal, uniquelocal');
+gateway.set('trust proxy', 'loopback');
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   limit: 100,
   message: 'Too many requests from this IP, please try again later.',
 });
 gateway.use(limiter);
-gateway.use(express.json());
+gateway.use(express.json({ limit: '1mb' }));
 gateway.use(compression());
 
 gateway.use('/:service', proxy);

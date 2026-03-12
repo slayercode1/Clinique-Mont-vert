@@ -23,14 +23,18 @@ const user = userStore();
 
 const showAddDialog = ref(false);
 
-onBeforeMount(async () => {
-  await ticket.fetchTickets();
-  await user.fetchUsers();
+const dateFormatter = new Intl.DateTimeFormat('fr-FR', {
+  year: 'numeric',
+  month: 'long',
+  day: '2-digit',
+});
+
+onBeforeMount(() => {
+  Promise.all([ticket.fetchTickets(), user.fetchUsers()]);
 });
 
 const closeAddDialog = () => {
   showAddDialog.value = false;
-  ticket.fetchTickets();
 };
 
 const columns: ColumnDef<Ticket>[] = [
@@ -50,11 +54,7 @@ const columns: ColumnDef<Ticket>[] = [
       return h(
         'div',
         { class: 'font-medium' },
-        new Intl.DateTimeFormat('fr-FR', {
-          year: 'numeric',
-          month: 'long',
-          day: '2-digit',
-        }).format(new Date(row.getValue('created_at')))
+        dateFormatter.format(new Date(row.getValue('created_at')))
       );
     },
   },
@@ -220,7 +220,7 @@ const columns: ColumnDef<Ticket>[] = [
     cell: ({ row }) => {
       const priority = row.getValue('priority') as string;
       const priorityStyles = {
-        HIGH: 'bg-red-600 text-white',
+        HIGT: 'bg-red-600 text-white',
         MEDIUM: 'bg-yellow-500 text-white',
         LOW: 'bg-green-500 text-white',
       };
@@ -250,21 +250,21 @@ const columns: ColumnDef<Ticket>[] = [
             h(
               DropdownMenuItem,
               {
-                onClick: () => ticket.updateTicket({ state: 'HIGH' }, row.original.id),
+                onClick: () => ticket.updateTicket({ priority: 'HIGT' }, row.original.id),
               },
-              'HIGH'
+              'HIGT'
             ),
             h(
               DropdownMenuItem,
               {
-                onClick: () => ticket.updateTicket({ state: 'MEDIUM' }, row.original.id),
+                onClick: () => ticket.updateTicket({ priority: 'MEDIUM' }, row.original.id),
               },
               'MEDIUM'
             ),
             h(
               DropdownMenuItem,
               {
-                onClick: () => ticket.updateTicket({ state: 'LOW' }, row.original.id),
+                onClick: () => ticket.updateTicket({ priority: 'LOW' }, row.original.id),
               },
               'LOW'
             ),
@@ -290,11 +290,7 @@ const columns: ColumnDef<Ticket>[] = [
         'div',
         { class: 'font-medium' },
         row.getValue('validated_at') !== null
-          ? new Intl.DateTimeFormat('fr-FR', {
-              year: 'numeric',
-              month: 'long',
-              day: '2-digit',
-            }).format(new Date(row.getValue('validated_at')))
+          ? dateFormatter.format(new Date(row.getValue('validated_at')))
           : '--'
       );
     },

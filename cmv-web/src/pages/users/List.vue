@@ -38,12 +38,10 @@ const openEditDialog = (id: string) => {
 const closeEditDialog = () => {
   showEditDialog.value = false;
   selectedUserId.value = null;
-  user.fetchUsers();
 };
 
 const closeAddDialog = () => {
   showAddDialog.value = false;
-  user.fetchUsers();
 };
 
 const columns: ColumnDef<User>[] = [

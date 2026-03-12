@@ -10,6 +10,10 @@ package-lock.json
 # Build outputs
 dist/
 build/
+*.tsbuildinfo
+
+# Archives
+*.zip
 
 # Logs
 *.log

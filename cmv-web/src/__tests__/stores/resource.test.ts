@@ -16,6 +16,7 @@ const sampleResource: Resource = {
 function mockFetchOk(data: unknown) {
   (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
     ok: true,
+    status: 200,
     json: async () => data,
   });
 }
@@ -23,6 +24,7 @@ function mockFetchOk(data: unknown) {
 function mockFetchFail(data: unknown) {
   (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
     ok: false,
+    status: 400,
     json: async () => data,
   });
 }
@@ -42,14 +44,15 @@ describe('resourceStore', () => {
       expect(store.resources).toEqual([sampleResource]);
     });
 
-    it('does not throw on fetch error (logs instead)', async () => {
+    it('throws on fetch error', async () => {
       (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: false,
+        status: 500,
         statusText: 'Server Error',
         json: async () => ({}),
       });
       const store = resourceStore();
-      await expect(store.fetchResources()).resolves.not.toThrow();
+      await expect(store.fetchResources()).rejects.toThrow('Server Error');
     });
   });
 
@@ -93,6 +96,7 @@ describe('resourceStore', () => {
     it('does not throw on successful delete', async () => {
       (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
+        status: 200,
         json: async () => ({}),
       });
       const store = resourceStore();
