@@ -1,25 +1,18 @@
-import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
-import { sendemail } from './task.js';
+import type { Request, Response } from 'express';
+import { getCache, invalidateCache, setCache } from '../../utils/cache.js';
 import prisma from '../../utils/prisma.js';
-import { UserType } from '../../utils/types/index.js';
+import type { UserType } from '../../utils/types/index.js';
+import { sendemail } from './task.js';
 
-export const getUsers = async (
-  _: Request,
-  response: Response
-): Promise<any> => {
+export const getUsers = async (_: Request, response: Response): Promise<any> => {
   try {
+    const cached = await getCache('users');
+    if (cached) return response.status(200).json(cached);
+
     const users = await prisma.user.findMany({
-      where: {
-        firstname: {
-          not: 'technique',
-        },
-        deleted: false,
-      },
-      include: {
-        role: true,
-        service: true,
-      },
+      where: { firstname: { not: 'technique' }, deleted: false },
+      include: { role: true, service: true },
     });
 
     const serializedUsers = users.map((user) => {
@@ -27,20 +20,18 @@ export const getUsers = async (
       return userWithoutPassword;
     });
 
-    return response.status(200).json({ success: true, data: serializedUsers });
-  } catch (e) {
+    const payload = { success: true, data: serializedUsers };
+    await setCache('users', payload, 300);
+    return response.status(200).json(payload);
+  } catch (_e) {
     return response.status(500).json({
       success: false,
-      message:
-        'Une erreur est survenue lors de la récupération des utilisateurs',
+      message: 'Une erreur est survenue lors de la récupération des utilisateurs',
     });
   }
 };
 
-export const getUser = async (
-  request: Request,
-  response: Response
-): Promise<any> => {
+export const getUser = async (request: Request, response: Response): Promise<any> => {
   try {
     const id = request.params.id;
     const user = await prisma.user.findUnique({
@@ -62,24 +53,24 @@ export const getUser = async (
       success: true,
       data: userWithoutPassword,
     });
-  } catch (e) {
+  } catch (_e) {
     return response.status(500).json({
       success: false,
-      message:
-        "Une erreur est survenue lors de la récupération de l'utilisateur",
+      message: "Une erreur est survenue lors de la récupération de l'utilisateur",
     });
   }
 };
 
-export const getRoles = async (
-  _: Request,
-  response: Response
-): Promise<any> => {
+export const getRoles = async (_: Request, response: Response): Promise<any> => {
   try {
-    const role = await prisma.role.findMany();
+    const cached = await getCache('roles');
+    if (cached) return response.status(200).json(cached);
 
-    return response.status(200).json({ success: true, data: role });
-  } catch (e) {
+    const role = await prisma.role.findMany();
+    const payload = { success: true, data: role };
+    await setCache('roles', payload, 3600); // 1 heure — données très statiques
+    return response.status(200).json(payload);
+  } catch (_e) {
     return response.status(500).json({
       success: false,
       message: 'Une erreur est survenue lors de la récupération des roles',
@@ -87,10 +78,7 @@ export const getRoles = async (
   }
 };
 
-export const createUser = async (
-  request: Request,
-  response: Response
-): Promise<any> => {
+export const createUser = async (request: Request, response: Response): Promise<any> => {
   const body = request.body as UserType;
 
   try {
@@ -113,8 +101,8 @@ export const createUser = async (
         email: body.email,
         password: passwordHash,
         status: body.status,
-        roleId: role!.id,
-        serviceId: service!.id,
+        roleId: role?.id,
+        serviceId: service?.id,
       },
     });
     const { password, ...userWithoutPassword } = user;
@@ -128,21 +116,17 @@ export const createUser = async (
       response
     );
 
-    return response
-      .status(200)
-      .json({ success: true, data: userWithoutPassword });
-  } catch (e) {
+    await invalidateCache('users');
+    return response.status(200).json({ success: true, data: userWithoutPassword });
+  } catch (_e) {
     return response.status(500).json({
       success: false,
-      message: `Une erreur est survenue lors de la creation de utilisateurs`,
+      message: 'Une erreur est survenue lors de la creation de utilisateurs',
     });
   }
 };
 
-export const updateUsers = async (
-  request: Request,
-  response: Response
-): Promise<any> => {
+export const updateUsers = async (request: Request, response: Response): Promise<any> => {
   const body = request.body;
   const id = request.params.id;
   try {
@@ -178,10 +162,9 @@ export const updateUsers = async (
     });
 
     const { password, ...userWithoutPassword } = userUpdate;
-    return response
-      .status(200)
-      .json({ success: true, data: userWithoutPassword });
-  } catch (e) {
+    await invalidateCache('users', `user:${id}`);
+    return response.status(200).json({ success: true, data: userWithoutPassword });
+  } catch (_e) {
     return response.status(500).json({
       success: false,
       message: `Une erreur est survenue lors de la modification de utilisateurs ${id}`,
@@ -189,14 +172,16 @@ export const updateUsers = async (
   }
 };
 
-export const getServices = async (
-  _: Request,
-  response: Response
-): Promise<any> => {
+export const getServices = async (_: Request, response: Response): Promise<any> => {
   try {
+    const cached = await getCache('services');
+    if (cached) return response.status(200).json(cached);
+
     const services = await prisma.service.findMany();
-    return response.status(200).json({ success: true, data: services });
-  } catch (e) {
+    const payload = { success: true, data: services };
+    await setCache('services', payload, 3600);
+    return response.status(200).json(payload);
+  } catch (_e) {
     return response.status(500).json({
       success: false,
       message: 'Une erreur est survenue lors de la récupération des services',
@@ -204,11 +189,11 @@ export const getServices = async (
   }
 };
 
-export const getPermissions = async (
-  _: Request,
-  response: Response
-): Promise<any> => {
+export const getPermissions = async (_: Request, response: Response): Promise<any> => {
   try {
+    const cached = await getCache('permissions');
+    if (cached) return response.status(200).json(cached);
+
     const permissions = await prisma.permissionOnRole.findMany({
       include: {
         permission: true,
@@ -218,29 +203,28 @@ export const getPermissions = async (
 
     const formattedData: Record<string, Record<string, string[]>> = {};
 
-    permissions.forEach(({ role, permission }) => {
-      const roleName = role.name; // Assurez-vous que le champ 'name' correspond au nom du rôle
-      const entityName = permission.resource; // Assurez-vous que le champ 'entity' correspond à l'entité (e.g., 'users', 'posts')
-      const action = permission.action; // Assurez-vous que le champ 'action' correspond à l'action (e.g., 'read', 'edit')
+    for (const { role, permission } of permissions) {
+      const roleName = role.name;
+      const entityName = permission.resource;
+      const action = permission.action;
 
-      // Si le rôle n'existe pas encore dans l'objet, on l'initialise
       if (!formattedData[roleName]) {
         formattedData[roleName] = {};
       }
 
-      // Si l'entité n'existe pas encore pour ce rôle, on l'initialise
       if (!formattedData[roleName][entityName]) {
         formattedData[roleName][entityName] = [];
       }
 
-      // On ajoute l'action à la liste des permissions de l'entité
       if (!formattedData[roleName][entityName].includes(action)) {
         formattedData[roleName][entityName].push(action);
       }
-    });
+    }
 
-    return response.status(200).json({ success: true, data: formattedData });
-  } catch (e) {
+    const payload = { success: true, data: formattedData };
+    await setCache('permissions', payload, 3600);
+    return response.status(200).json(payload);
+  } catch (_e) {
     return response.status(500).json({
       success: false,
       message: 'Une erreur est survenue lors de la récupération des services',
@@ -248,10 +232,7 @@ export const getPermissions = async (
   }
 };
 
-export const deleteUser = async (
-  request: Request,
-  response: Response
-): Promise<any> => {
+export const deleteUser = async (request: Request, response: Response): Promise<any> => {
   try {
     const id = request.params.id;
 
@@ -274,22 +255,17 @@ export const deleteUser = async (
       },
     });
 
-    return response
-      .status(200)
-      .json({ success: true, message: 'Utilisateur supprimer' });
-  } catch (error) {
+    await invalidateCache('users', `user:${id}`);
+    return response.status(200).json({ success: true, message: 'Utilisateur supprimer' });
+  } catch (_error) {
     return response.status(500).json({
       success: false,
-      message:
-        "Une erreur est survenue lors de la suppression de l'utilisateur",
+      message: "Une erreur est survenue lors de la suppression de l'utilisateur",
     });
   }
 };
 
-export const createRole = async (
-  request: Request,
-  response: Response
-): Promise<any> => {
+export const createRole = async (request: Request, response: Response): Promise<any> => {
   try {
     const { name } = request.body as { name: string };
     const role = await prisma.role.create({
@@ -298,11 +274,9 @@ export const createRole = async (
       },
     });
 
-    return response.status(200).json({
-      success: true,
-      data: role,
-    });
-  } catch (e) {
+    await invalidateCache('roles');
+    return response.status(200).json({ success: true, data: role });
+  } catch (_e) {
     return response.status(400).json({
       success: false,
       message: 'Une erreur est survenue lors de la creation du role',
@@ -310,10 +284,7 @@ export const createRole = async (
   }
 };
 
-export const createService = async (
-  request: Request,
-  response: Response
-): Promise<any> => {
+export const createService = async (request: Request, response: Response): Promise<any> => {
   try {
     const { name } = request.body as { name: string };
     const service = await prisma.service.create({
@@ -322,11 +293,9 @@ export const createService = async (
       },
     });
 
-    return response.status(200).json({
-      success: true,
-      data: service,
-    });
-  } catch (e) {
+    await invalidateCache('services');
+    return response.status(200).json({ success: true, data: service });
+  } catch (_e) {
     return response.status(400).json({
       success: false,
       message: 'Une erreur est survenue lors de la creation du service',
@@ -405,12 +374,13 @@ export const createOrUpdatePermissions = async (
         await prisma.permissionOnRole.create({
           data: {
             roleId,
-            permissionId: permission!.id,
+            permissionId: permission?.id,
           },
         });
       }
     }
 
+    await invalidateCache('permissions');
     return response.status(200).json({
       success: true,
       message: 'Permissions mises à jour avec succès pour le rôle',
@@ -419,8 +389,7 @@ export const createOrUpdatePermissions = async (
     console.error(e);
     return response.status(500).json({
       success: false,
-      message:
-        "Une erreur est survenue lors de l'enregistrement des permissions",
+      message: "Une erreur est survenue lors de l'enregistrement des permissions",
     });
   }
 };

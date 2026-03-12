@@ -1,19 +1,20 @@
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
+import { getCache, invalidateCache, setCache } from '../../utils/cache.js';
 import prisma from '../../utils/prisma.js';
-import { CostType, VehicleType } from '../../utils/types/index.js';
+import type { CostType, VehicleType } from '../../utils/types/index.js';
 
-export const getVehicles = async (
-  _: Request,
-  response: Response,
-): Promise<any> => {
+const TTL = 300;
+
+export const getVehicles = async (_: Request, response: Response): Promise<any> => {
   try {
-    const vehicles = await prisma.vehicle.findMany({
-      where: {
-        deleted: false,
-      },
-    });
-    return response.status(200).json({ success: true, data: vehicles });
-  } catch (e) {
+    const cached = await getCache('vehicles');
+    if (cached) return response.status(200).json(cached);
+
+    const vehicles = await prisma.vehicle.findMany({ where: { deleted: false } });
+    const payload = { success: true, data: vehicles };
+    await setCache('vehicles', payload, TTL);
+    return response.status(200).json(payload);
+  } catch (_e) {
     return response.status(500).json({
       success: false,
       message: 'Une erreur est survenue lors de la récupération des véhicules',
@@ -21,10 +22,7 @@ export const getVehicles = async (
   }
 };
 
-export const getVehicle = async (
-  request: Request,
-  response: Response,
-): Promise<any> => {
+export const getVehicle = async (request: Request, response: Response): Promise<any> => {
   try {
     const id = request.params.id;
     const vehicle = await prisma.vehicle.findUnique({
@@ -34,7 +32,7 @@ export const getVehicle = async (
     if (!vehicle) {
       return response.status(404).json({
         success: false,
-        message: 'Le véhicule n\'a pas était trouver',
+        message: "Le véhicule n'a pas était trouver",
       });
     }
 
@@ -42,8 +40,7 @@ export const getVehicle = async (
       success: true,
       data: vehicle,
     });
-
-  } catch (e) {
+  } catch (_e) {
     return response.status(500).json({
       success: false,
       message: 'Une erreur est survenue lors de la récupération du véhicule',
@@ -51,10 +48,7 @@ export const getVehicle = async (
   }
 };
 
-export const getCost = async (
-  request: Request,
-  response: Response,
-): Promise<any> => {
+export const getCost = async (request: Request, response: Response): Promise<any> => {
   try {
     const id = request.params.id;
     const vehicleId = await prisma.vehicle.findUnique({
@@ -64,7 +58,7 @@ export const getCost = async (
     if (!vehicleId) {
       return response.status(404).json({
         success: false,
-        message: 'Le véhicule n\'a pas était trouver ',
+        message: "Le véhicule n'a pas était trouver ",
       });
     }
 
@@ -76,7 +70,7 @@ export const getCost = async (
     });
 
     return response.status(200).json({ success: true, data: vehicle });
-  } catch (e) {
+  } catch (_e) {
     return response.status(500).json({
       success: false,
       message: 'Une erreur est survenue lors de la récupération du véhicule',
@@ -84,10 +78,7 @@ export const getCost = async (
   }
 };
 
-export const createVehicle = async (
-  request: Request,
-  response: Response,
-): Promise<any> => {
+export const createVehicle = async (request: Request, response: Response): Promise<any> => {
   try {
     const body = request.body as VehicleType;
     const newVehicle = await prisma.vehicle.create({
@@ -101,19 +92,17 @@ export const createVehicle = async (
       },
     });
 
+    await invalidateCache('vehicles');
     return response.status(200).json({ success: true, data: newVehicle });
-  } catch (e) {
+  } catch (_e) {
     return response.status(500).json({
       success: false,
-      message: `Une erreur est survenue lors de la creation du véhicule`,
+      message: 'Une erreur est survenue lors de la creation du véhicule',
     });
   }
 };
 
-export const createCost = async (
-  request: Request,
-  response: Response,
-): Promise<any> => {
+export const createCost = async (request: Request, response: Response): Promise<any> => {
   try {
     const body = request.body as CostType;
     const newCost = await prisma.cost.create({
@@ -125,8 +114,9 @@ export const createCost = async (
       },
     });
 
+    await invalidateCache(`vehicle_cost:${newCost.vehicleId}`);
     return response.status(200).json({ success: true, data: newCost });
-  } catch (e) {
+  } catch (_e) {
     return response.status(500).json({
       success: false,
       message: `Une erreur est survenue lors de la creation d' un coût `,
@@ -134,10 +124,7 @@ export const createCost = async (
   }
 };
 
-export const updateVehicle = async (
-  request: Request,
-  response: Response,
-): Promise<any> => {
+export const updateVehicle = async (request: Request, response: Response): Promise<any> => {
   const id = request.params.id;
 
   try {
@@ -151,7 +138,7 @@ export const updateVehicle = async (
     if (!vehicle)
       return response.status(404).json({
         success: false,
-        message: 'Le véhicule n\'a pas était trouver ',
+        message: "Le véhicule n'a pas était trouver ",
       });
 
     const vehicleUpdate = await prisma.vehicle.update({
@@ -163,8 +150,9 @@ export const updateVehicle = async (
       },
     });
 
+    await invalidateCache('vehicles', `vehicle:${id}`);
     return response.status(200).json({ success: true, data: vehicleUpdate });
-  } catch (e) {
+  } catch (_e) {
     return response.status(500).json({
       success: false,
       message: `Une erreur est survenue lors de la modification du véhicule ${id}`,
@@ -172,10 +160,7 @@ export const updateVehicle = async (
   }
 };
 
-export const deleteVehicle = async (
-  request: Request,
-  response: Response,
-): Promise<any> => {
+export const deleteVehicle = async (request: Request, response: Response): Promise<any> => {
   try {
     const id = request.params.id;
 
@@ -188,7 +173,7 @@ export const deleteVehicle = async (
     if (!vehicle)
       return response.status(404).json({
         success: false,
-        message: 'Le véhicule n\'a pas etait trouver ',
+        message: "Le véhicule n'a pas etait trouver ",
       });
 
     await prisma.vehicle.update({
@@ -198,22 +183,17 @@ export const deleteVehicle = async (
       },
     });
 
+    await invalidateCache('vehicles', `vehicle:${id}`);
     return response.status(200).json({ success: true, message: 'Le vehicle a était supprimer' });
-
-
-  } catch (error) {
+  } catch (_error) {
     return response.status(500).json({
       success: false,
-      message:
-        'Une erreur est survenue lors de la suppression du vehicule',
+      message: 'Une erreur est survenue lors de la suppression du vehicule',
     });
   }
 };
 
-export const deleteCost = async (
-  request: Request,
-  response: Response,
-): Promise<any> => {
+export const deleteCost = async (request: Request, response: Response): Promise<any> => {
   try {
     const id = request.params.id;
 
@@ -226,7 +206,7 @@ export const deleteCost = async (
     if (!cost)
       return response.status(404).json({
         success: false,
-        message: 'Le coût n\'a pas etait trouver ',
+        message: "Le coût n'a pas etait trouver ",
       });
 
     await prisma.cost.update({
@@ -236,14 +216,12 @@ export const deleteCost = async (
       },
     });
 
+    await invalidateCache(`vehicle_cost:${cost.vehicleId}`);
     return response.status(200).json({ success: true, message: 'Le coût a était supprimer' });
-
-
-  } catch (error) {
+  } catch (_error) {
     return response.status(500).json({
       success: false,
-      message:
-        'Une erreur est survenue lors de la suppression du coût',
+      message: 'Une erreur est survenue lors de la suppression du coût',
     });
   }
 };

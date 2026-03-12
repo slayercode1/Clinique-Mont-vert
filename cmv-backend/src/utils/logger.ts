@@ -1,5 +1,5 @@
-import bunyan from 'bunyan';
 import * as path from 'node:path';
+import bunyan from 'bunyan';
 
 // Obtenez le chemin vers le dossier logs à partir de la racine du projet
 const logsDir = path.resolve(__dirname, 'logs');

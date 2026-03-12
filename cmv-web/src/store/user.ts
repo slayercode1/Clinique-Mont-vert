@@ -1,5 +1,6 @@
+import { STORAGE_KEY } from '@/utils/storage';
+import type { Payload, UserType } from '@/utils/types';
 import { defineStore } from 'pinia';
-import { Payload, UserType } from '@/utils/types';
 import { API_ENDPOINT } from './api-endpoint';
 
 //Pour ajouter un champ a un type exitant
@@ -37,7 +38,7 @@ export const userStore = defineStore('user', {
       try {
         const response = await fetch(`${API_ENDPOINT}/it/users`, {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('ssid')}`,
+            Authorization: `Bearer ${localStorage.getItem(STORAGE_KEY)}`,
             'Content-Type': 'application/json',
           },
         });
@@ -52,7 +53,7 @@ export const userStore = defineStore('user', {
       try {
         const response = await fetch(`${API_ENDPOINT}/it/user/${id}`, {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('ssid')}`,
+            Authorization: `Bearer ${localStorage.getItem(STORAGE_KEY)}`,
             'Content-Type': 'application/json',
           },
         });
@@ -67,7 +68,7 @@ export const userStore = defineStore('user', {
       try {
         const response = await fetch(`${API_ENDPOINT}/it/roles`, {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('ssid')}`,
+            Authorization: `Bearer ${localStorage.getItem(STORAGE_KEY)}`,
             'Content-Type': 'application/json',
           },
         });
@@ -82,7 +83,7 @@ export const userStore = defineStore('user', {
       try {
         const response = await fetch(`${API_ENDPOINT}/it/services`, {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('ssid')}`,
+            Authorization: `Bearer ${localStorage.getItem(STORAGE_KEY)}`,
             'Content-Type': 'application/json',
           },
         });
@@ -97,7 +98,7 @@ export const userStore = defineStore('user', {
       try {
         const response = await fetch(`${API_ENDPOINT}/it/permissions`, {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('ssid')}`,
+            Authorization: `Bearer ${localStorage.getItem(STORAGE_KEY)}`,
             'Content-Type': 'application/json',
           },
         });
@@ -113,7 +114,7 @@ export const userStore = defineStore('user', {
       const response = await fetch(`${API_ENDPOINT}/it/user`, {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('ssid')}`,
+          Authorization: `Bearer ${localStorage.getItem(STORAGE_KEY)}`,
           'Content-Type': 'application/json', // optional, depending on the API requirements
         },
         body: JSON.stringify(user),
@@ -130,7 +131,7 @@ export const userStore = defineStore('user', {
       const response = await fetch(`${API_ENDPOINT}/it/user/${id}`, {
         method: 'PATCH',
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('ssid')}`,
+          Authorization: `Bearer ${localStorage.getItem(STORAGE_KEY)}`,
           'Content-Type': 'application/json', // optional, depending on the API requirements
         },
         body: JSON.stringify(user),
@@ -139,7 +140,7 @@ export const userStore = defineStore('user', {
       if (!response.ok) {
         throw new Error(data.message);
       }
-      this.users = this.users.map((user: any) => (user.id === data.id ? data : user));
+      this.users = this.users.map((user: User) => (user.id === data.id ? data : user));
       return data;
     },
 
@@ -148,7 +149,7 @@ export const userStore = defineStore('user', {
         const response = await fetch(`${API_ENDPOINT}/it/delete-user/${id}`, {
           method: 'DELETE',
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('ssid')}`,
+            Authorization: `Bearer ${localStorage.getItem(STORAGE_KEY)}`,
             'Content-Type': 'application/json',
           },
         });
@@ -167,7 +168,7 @@ export const userStore = defineStore('user', {
       const response = await fetch(`${API_ENDPOINT}/it/role`, {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('ssid')}`,
+          Authorization: `Bearer ${localStorage.getItem(STORAGE_KEY)}`,
           'Content-Type': 'application/json', // optional, depending on the API requirements
         },
         body: JSON.stringify(name),
@@ -184,7 +185,7 @@ export const userStore = defineStore('user', {
       const response = await fetch(`${API_ENDPOINT}/it/service`, {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('ssid')}`,
+          Authorization: `Bearer ${localStorage.getItem(STORAGE_KEY)}`,
           'Content-Type': 'application/json', // optional, depending on the API requirements
         },
         body: JSON.stringify(name),
@@ -201,7 +202,7 @@ export const userStore = defineStore('user', {
       const response = await fetch(`${API_ENDPOINT}/it/permission`, {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('ssid')}`,
+          Authorization: `Bearer ${localStorage.getItem(STORAGE_KEY)}`,
           'Content-Type': 'application/json', // optional, depending on the API requirements
         },
         body: JSON.stringify(payload),

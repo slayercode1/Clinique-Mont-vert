@@ -1,6 +1,7 @@
+import { STORAGE_KEY } from '@/utils/storage';
 import { defineStore } from 'pinia';
-import { User } from './user';
 import { API_ENDPOINT } from './api-endpoint';
+import type { User } from './user';
 
 export const authStore = defineStore('auth', {
   state() {
@@ -12,56 +13,46 @@ export const authStore = defineStore('auth', {
 
   actions: {
     async signin(payload: { email: string; password: string }) {
-      try {
-        const response = await fetch(`${API_ENDPOINT}/it/sign-in`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(payload),
-        });
+      const response = await fetch(`${API_ENDPOINT}/it/sign-in`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
 
-        const data = await response.json();
+      const data = await response.json();
 
-        // Si la réponse n'est pas ok (status 400 par exemple)
-        if (!response.ok) {
-          throw new Error(data.message);
-        }
-        return data;
-      } catch (error) {
-        // Propager l'erreur pour la gérer dans handleSubmit
-        throw error;
+      // Si la réponse n'est pas ok (status 400 par exemple)
+      if (!response.ok) {
+        throw new Error(data.message);
       }
+      return data;
     },
 
     async session() {
-      try {
-        const response = await fetch(`${API_ENDPOINT}/it/session`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('ssid')}`,
-            'Content-Type': 'application/json', // optional, depending on the API requirements
-          },
-        });
+      const response = await fetch(`${API_ENDPOINT}/it/session`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem(STORAGE_KEY)}`,
+          'Content-Type': 'application/json', // optional, depending on the API requirements
+        },
+      });
 
-        const data = await response.json();
+      const data = await response.json();
 
-        // Si la réponse n'est pas ok (status 400 par exemple)
-        if (!response.ok) {
-          throw new Error(data.message);
-        }
-
-        this.user = data.data;
-        return data;
-      } catch (error) {
-        // Propager l'erreur pour la gérer dans handleSubmit
-        throw error;
+      // Si la réponse n'est pas ok (status 400 par exemple)
+      if (!response.ok) {
+        throw new Error(data.message);
       }
+
+      this.user = data.data;
+      return data;
     },
 
     async signout(id: string) {
       await fetch(`${API_ENDPOINT}/it/sign-out/${id}`, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('ssid')}`,
+          Authorization: `Bearer ${localStorage.getItem(STORAGE_KEY)}`,
           'Content-Type': 'application/json', // optional, depending on the API requirements
         },
         method: 'POST',
@@ -71,7 +62,7 @@ export const authStore = defineStore('auth', {
       const response = await fetch(`${API_ENDPOINT}/it/change-password`, {
         method: 'PATCH',
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('ssid')}`,
+          Authorization: `Bearer ${localStorage.getItem(STORAGE_KEY)}`,
           'Content-Type': 'application/json', // optional, depending on the API requirements
         },
         body: JSON.stringify({

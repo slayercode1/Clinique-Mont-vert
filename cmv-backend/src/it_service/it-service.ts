@@ -1,11 +1,12 @@
-import express from 'express';
-import dotenv from 'dotenv';
+import compression from 'compression';
 import cors from 'cors';
-import helmet from 'helmet';
+import dotenv from 'dotenv';
+import express from 'express';
 import rateLimit from 'express-rate-limit';
+import helmet from 'helmet';
 import { routes } from './router/index.js';
 
-dotenv.config();
+dotenv.config({ quiet: true });
 
 const it_service = express();
 const port = process.env.PORT_SERVICE_IT;
@@ -32,6 +33,7 @@ const limiter = rateLimit({
 });
 it_service.use(limiter);
 it_service.use(express.json());
+it_service.use(compression());
 it_service.use(routes);
 
 it_service.listen(port);

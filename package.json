@@ -1,0 +1,20 @@
+{
+  "name": "clinique-mont-vert",
+  "private": true,
+  "workspaces": ["cmv-backend", "cmv-web"],
+  "scripts": {
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write .",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.3.0"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx,json}": ["biome check --write --no-errors-on-unmatched"],
+    "*.{vue}": ["biome format --write --no-errors-on-unmatched"]
+  }
+}

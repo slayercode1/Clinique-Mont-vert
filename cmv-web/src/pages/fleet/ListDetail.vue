@@ -1,14 +1,14 @@
 <script lang="ts" setup>
-import { h, onBeforeMount } from 'vue';
 import DataTable from '@/components/DataTable.vue';
-import { ColumnDef } from '@tanstack/vue-table';
-import { useRoute, useRouter } from 'vue-router';
-import Button from '@/components/ui/button/Button.vue';
-import { ArrowUpDown } from 'lucide-vue-next';
-import { fleetStore } from '@/store/fleet.ts';
-import CostAdd from '@/pages/fleet/CostAdd.vue';
-import { CostType, VehicleType } from '@/utils/types';
 import DropdownAction from '@/components/data-table-dropdown.vue';
+import Button from '@/components/ui/button/Button.vue';
+import CostAdd from '@/pages/fleet/CostAdd.vue';
+import { fleetStore } from '@/store/fleet.ts';
+import { CostType, VehicleType } from '@/utils/types';
+import { ColumnDef } from '@tanstack/vue-table';
+import { ArrowUpDown } from 'lucide-vue-next';
+import { h, onBeforeMount } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
 const vehicle = fleetStore();
 const router = useRouter();
@@ -34,7 +34,7 @@ const columns: ColumnDef<CostType>[] = [
           variant: 'ghost',
           onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
         },
-        () => ['Date de maintenance', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })],
+        () => ['Date de maintenance', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]
       );
     },
     cell: ({ row }) => {
@@ -43,11 +43,11 @@ const columns: ColumnDef<CostType>[] = [
         { class: 'font-medium' },
         row.getValue('maintenance_date') !== null
           ? new Intl.DateTimeFormat('fr-FR', {
-            year: 'numeric',
-            month: 'long',
-            day: '2-digit',
-          }).format(new Date(row.getValue('maintenance_date')))
-          : '--',
+              year: 'numeric',
+              month: 'long',
+              day: '2-digit',
+            }).format(new Date(row.getValue('maintenance_date')))
+          : '--'
       );
     },
   },
@@ -60,7 +60,7 @@ const columns: ColumnDef<CostType>[] = [
           variant: 'ghost',
           onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
         },
-        () => ['Coût', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })],
+        () => ['Coût', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]
       );
     },
     cell: ({ row }) => {
@@ -85,7 +85,7 @@ const columns: ColumnDef<CostType>[] = [
           variant: 'ghost',
           onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
         },
-        () => ['Motif', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })],
+        () => ['Motif', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]
       );
     },
     cell: ({ row }) => {
@@ -105,7 +105,7 @@ const columns: ColumnDef<CostType>[] = [
           url_update: false,
           detail: false,
           handleDelete: () => handleDelete(cost.id),
-        }),
+        })
       );
     },
   },

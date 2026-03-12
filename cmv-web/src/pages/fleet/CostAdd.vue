@@ -1,12 +1,12 @@
 <script setup lang="ts">
+import { AutoForm } from '@/components/ui/auto-form';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { fleetStore } from '@/store/fleet.ts';
+import { createCostSchema } from '@/utils/schemas/create-vehicle.schema.ts';
 import { computed, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { AutoForm } from '@/components/ui/auto-form';
-import { fleetStore } from '@/store/fleet.ts';
 import { toast } from 'vue-sonner';
-import { createCostSchema } from '@/utils/schemas/create-vehicle.schema.ts';
 
 const route = useRoute();
 const router = useRouter();

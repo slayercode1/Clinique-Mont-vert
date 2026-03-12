@@ -1,12 +1,5 @@
 <script lang="ts" setup>
-import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
-import { Toaster } from '@/components/ui/sonner';
 import AppSidebar from '@/components/AppSidebar.vue';
-import { useTokenStore } from './store/token';
-import { computed, onMounted, ref } from 'vue';
-import { authStore } from './store/auth';
-import Splashscreen from './components/Splashscreen.vue';
-import { Settings } from 'lucide-vue-next';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,7 +8,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+import { Toaster } from '@/components/ui/sonner';
+import { Settings } from 'lucide-vue-next';
+import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import Splashscreen from './components/Splashscreen.vue';
+import { authStore } from './store/auth';
+import { useTokenStore } from './store/token';
 
 const router = useRouter();
 const showSplashscreen = ref<boolean>(true);
@@ -106,7 +106,9 @@ const sidebarMenuItems = computed(() => {
           </DropdownMenu>
         </div>
       </div>
-      <RouterView />
+      <div class="flex-1 min-w-0">
+        <RouterView />
+      </div>
     </div>
   </SidebarProvider>
 </template>

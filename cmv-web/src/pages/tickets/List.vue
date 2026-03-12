@@ -1,31 +1,37 @@
 <script lang="ts" setup>
-import { h, onBeforeMount } from 'vue';
 import DataTable from '@/components/DataTable.vue';
-import { ColumnDef } from '@tanstack/vue-table';
-import { useRouter } from 'vue-router';
-import Button from '@/components/ui/button/Button.vue';
-import { ArrowUpDown } from 'lucide-vue-next';
-import { Ticket, ticketStore } from '@/store/ticket';
-import { Card } from '@/components/ui/card';
+import DropdownAction from '@/components/data-table-dropdown.vue';
 import Badge from '@/components/ui/badge/Badge.vue';
+import Button from '@/components/ui/button/Button.vue';
+import { Card } from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Ticket, ticketStore } from '@/store/ticket';
 import { userStore } from '@/store/user.ts';
 import { UserType } from '@/utils/types';
-import DropdownAction from '@/components/data-table-dropdown.vue';
+import { ColumnDef } from '@tanstack/vue-table';
+import { ArrowUpDown } from 'lucide-vue-next';
+import { h, onBeforeMount, ref } from 'vue';
+import FormsDialog from './FormsDialog.vue';
 
 const ticket = ticketStore();
 const user = userStore();
-const router = useRouter();
+
+const showAddDialog = ref(false);
 
 onBeforeMount(async () => {
   await ticket.fetchTickets();
   await user.fetchUsers();
 });
+
+const closeAddDialog = () => {
+  showAddDialog.value = false;
+  ticket.fetchTickets();
+};
 
 const columns: ColumnDef<Ticket>[] = [
   {
@@ -37,7 +43,7 @@ const columns: ColumnDef<Ticket>[] = [
           variant: 'ghost',
           onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
         },
-        () => ['Date Création', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })],
+        () => ['Date Création', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]
       );
     },
     cell: ({ row }) => {
@@ -48,7 +54,7 @@ const columns: ColumnDef<Ticket>[] = [
           year: 'numeric',
           month: 'long',
           day: '2-digit',
-        }).format(new Date(row.getValue('created_at'))),
+        }).format(new Date(row.getValue('created_at')))
       );
     },
   },
@@ -61,7 +67,7 @@ const columns: ColumnDef<Ticket>[] = [
           variant: 'ghost',
           onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
         },
-        () => ['Employé', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })],
+        () => ['Employé', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]
       );
     },
     cell: ({ row }) => {
@@ -72,7 +78,7 @@ const columns: ColumnDef<Ticket>[] = [
           ? (row.getValue('employee') as UserType).lastname +
               ' ' +
               (row.getValue('employee') as UserType).firstname
-          : '--',
+          : '--'
       );
     },
   },
@@ -85,7 +91,7 @@ const columns: ColumnDef<Ticket>[] = [
           variant: 'ghost',
           onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
         },
-        () => ['Problème', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })],
+        () => ['Problème', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]
       );
     },
     cell: ({ row }) => {
@@ -101,7 +107,7 @@ const columns: ColumnDef<Ticket>[] = [
           variant: 'ghost',
           onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
         },
-        () => ['Etat', h(ArrowUpDown, { class: 'ml-2 h-4 w-4 text-center' })],
+        () => ['Etat', h(ArrowUpDown, { class: 'ml-2 h-4 w-4 text-center' })]
       );
     },
     cell: ({ row }) => {
@@ -121,7 +127,7 @@ const columns: ColumnDef<Ticket>[] = [
         {
           class: `font-medium ${(statusStyles as any)[status] || 'bg-gray-200 text-black'}`,
         },
-        status.replace('_', ' '), // Affiche l'état de manière lisible (ex. "IN_USE" devient "In Use")
+        status.replace('_', ' ')
       );
 
       return h(
@@ -132,12 +138,10 @@ const columns: ColumnDef<Ticket>[] = [
             DropdownMenuTrigger,
             {
               onClick: (e: MouseEvent) => {
-                e.stopPropagation(); // Empêcher la propagation du clic
+                e.stopPropagation();
               },
             },
-            [
-              badge, // Affiche la valeur actuelle de l'état dans le bouton
-            ],
+            [badge]
           ),
           h(DropdownMenuContent, [
             h(
@@ -145,28 +149,28 @@ const columns: ColumnDef<Ticket>[] = [
               {
                 onClick: () => ticket.updateTicket({ status: 'IN_PROGRESS' }, row.original.id),
               },
-              'IN_PROGRESS',
+              'IN_PROGRESS'
             ),
             h(
               DropdownMenuItem,
               {
                 onClick: () => ticket.updateTicket({ status: 'TODO' }, row.original.id),
               },
-              'TODO',
+              'TODO'
             ),
             h(
               DropdownMenuItem,
               {
                 onClick: () => ticket.updateTicket({ status: 'BLOCKED' }, row.original.id),
               },
-              'BLOCKED',
+              'BLOCKED'
             ),
             h(
               DropdownMenuItem,
               {
                 onClick: () => ticket.updateTicket({ status: 'CLOSED' }, row.original.id),
               },
-              'CLOSED',
+              'CLOSED'
             ),
             h(
               DropdownMenuItem,
@@ -178,10 +182,10 @@ const columns: ColumnDef<Ticket>[] = [
                       resolvedBy: row.original.assign?.id,
                       validated_at: new Date(),
                     },
-                    row.original.id,
+                    row.original.id
                   ),
               },
-              'IN_VALIDATE',
+              'IN_VALIDATE'
             ),
             h(
               DropdownMenuItem,
@@ -191,13 +195,13 @@ const columns: ColumnDef<Ticket>[] = [
                     {
                       status: 'VALIDE',
                     },
-                    row.original.id,
+                    row.original.id
                   ),
               },
-              'VALIDE',
+              'VALIDE'
             ),
           ]),
-        ]),
+        ])
       );
     },
   },
@@ -210,7 +214,7 @@ const columns: ColumnDef<Ticket>[] = [
           variant: 'ghost',
           onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
         },
-        () => ['Priorité', h(ArrowUpDown, { class: 'ml-2 h-4 w-4 text-center' })],
+        () => ['Priorité', h(ArrowUpDown, { class: 'ml-2 h-4 w-4 text-center' })]
       );
     },
     cell: ({ row }) => {
@@ -226,7 +230,7 @@ const columns: ColumnDef<Ticket>[] = [
         {
           class: `font-medium ${(priorityStyles as any)[priority] || 'bg-gray-200 text-black'}`,
         },
-        priority.replace('_', ' '), // Affiche l'état de manière lisible (ex. "IN_USE" devient "In Use")
+        priority.replace('_', ' ')
       );
 
       return h(
@@ -237,12 +241,10 @@ const columns: ColumnDef<Ticket>[] = [
             DropdownMenuTrigger,
             {
               onClick: (e: MouseEvent) => {
-                e.stopPropagation(); // Empêcher la propagation du clic
+                e.stopPropagation();
               },
             },
-            [
-              badge, // Affiche la valeur actuelle de l'état dans le bouton
-            ],
+            [badge]
           ),
           h(DropdownMenuContent, [
             h(
@@ -250,24 +252,24 @@ const columns: ColumnDef<Ticket>[] = [
               {
                 onClick: () => ticket.updateTicket({ state: 'HIGH' }, row.original.id),
               },
-              'HIGH',
+              'HIGH'
             ),
             h(
               DropdownMenuItem,
               {
                 onClick: () => ticket.updateTicket({ state: 'MEDIUM' }, row.original.id),
               },
-              'MEDIUM',
+              'MEDIUM'
             ),
             h(
               DropdownMenuItem,
               {
                 onClick: () => ticket.updateTicket({ state: 'LOW' }, row.original.id),
               },
-              'LOW',
+              'LOW'
             ),
           ]),
-        ]),
+        ])
       );
     },
   },
@@ -280,7 +282,7 @@ const columns: ColumnDef<Ticket>[] = [
           variant: 'ghost',
           onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
         },
-        () => ['Date Résolution', h(ArrowUpDown, { class: 'ml-2 h-4 w-4 text-center' })],
+        () => ['Date Résolution', h(ArrowUpDown, { class: 'ml-2 h-4 w-4 text-center' })]
       );
     },
     cell: ({ row }) => {
@@ -293,7 +295,7 @@ const columns: ColumnDef<Ticket>[] = [
               month: 'long',
               day: '2-digit',
             }).format(new Date(row.getValue('validated_at')))
-          : '--',
+          : '--'
       );
     },
   },
@@ -306,7 +308,7 @@ const columns: ColumnDef<Ticket>[] = [
           variant: 'ghost',
           onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
         },
-        () => ['Résolu par', h(ArrowUpDown, { class: 'ml-2 h-4 w-4 text-center' })],
+        () => ['Résolu par', h(ArrowUpDown, { class: 'ml-2 h-4 w-4 text-center' })]
       );
     },
     cell: ({ row }) => {
@@ -317,7 +319,7 @@ const columns: ColumnDef<Ticket>[] = [
           ? (row.getValue('resolvedBy') as UserType).lastname +
               ' ' +
               (row.getValue('resolvedBy') as UserType).firstname
-          : '--',
+          : '--'
       );
     },
   },
@@ -325,15 +327,16 @@ const columns: ColumnDef<Ticket>[] = [
     id: 'actions',
     enableHiding: false,
     cell: ({ row }) => {
-      const ticket = row.original as Ticket;
+      const t = row.original as Ticket;
       return h(
         'div',
         { class: 'relative' },
         h(DropdownAction, {
-          data: ticket,
+          data: t,
           detail: true,
-          url_detail: `/ticket/${ticket.id}`,
-        }),
+          url_detail: `/ticket/${t.id}`,
+          url_update: false,
+        })
       );
     },
   },
@@ -370,7 +373,7 @@ const columns: ColumnDef<Ticket>[] = [
         </div>
       </div>
       <DataTable
-        :click="() => router.push('/ticket-add')"
+        :click="() => (showAddDialog = true)"
         :columns="columns"
         :data="ticket.getTickets"
         btn_text="Créer un ticket"
@@ -378,4 +381,6 @@ const columns: ColumnDef<Ticket>[] = [
       />
     </div>
   </div>
+
+  <FormsDialog :open="showAddDialog" @close="closeAddDialog" />
 </template>

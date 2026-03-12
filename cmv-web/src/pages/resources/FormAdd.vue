@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import { AutoForm } from '@/components/ui/auto-form';
 import { Button } from '@/components/ui/button';
+import { Resource, resourceStore } from '@/store/resource';
+import { createResourceSchema, resourceSchema } from '@/utils/schemas/create-resource.schema.ts';
+import { toTypedSchema } from '@vee-validate/zod';
+import { useForm } from 'vee-validate';
+import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { toast } from 'vue-sonner';
-import { Resource, resourceStore } from '@/store/resource';
-import { useForm } from 'vee-validate';
-import { toTypedSchema } from '@vee-validate/zod';
-import { ref } from 'vue';
-import { createResourceSchema, resourceSchema } from '@/utils/schemas/create-resource.schema.ts';
 
 const router = useRouter();
 const resource = resourceStore();
@@ -35,7 +35,6 @@ const createResource = (values: Resource) => {
       isloading.value = false;
     });
 };
-
 </script>
 
 <template>
@@ -54,7 +53,7 @@ const createResource = (values: Resource) => {
           <div class="md:absolute md:bottom-0 md:right-5">
             <Button type="submit">
               <span v-if="isloading" class="loaderBtn"></span>
-              <span v-else> Enregistre</span>
+              <span v-else>Enregistrer</span>
             </Button>
           </div>
         </AutoForm>

@@ -1,7 +1,7 @@
+import * as path from 'node:path';
+import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { Edge } from 'edge.js';
-import * as path from 'path';
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
 
 // Obtenir le chemin absolu du fichier actuel
 const __filename = fileURLToPath(import.meta.url);

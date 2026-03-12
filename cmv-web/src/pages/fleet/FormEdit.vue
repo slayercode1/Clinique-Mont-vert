@@ -1,19 +1,18 @@
 <script lang="ts" setup>
 import { AutoForm } from '@/components/ui/auto-form';
 import { Button } from '@/components/ui/button';
+import { fleetStore } from '@/store/fleet.ts';
+import { createVehicleSchema } from '@/utils/schemas/create-vehicle.schema.ts';
 import { toTypedSchema } from '@vee-validate/zod';
 import { useForm } from 'vee-validate';
 import { onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { toast } from 'vue-sonner';
-import { fleetStore } from '@/store/fleet.ts';
-import { createVehicleSchema } from '@/utils/schemas/create-vehicle.schema.ts';
 
 const vehicle = fleetStore();
 const router = useRouter();
 const route = useRoute();
 const isLoading = ref<boolean>(false);
-
 
 const form = useForm({
   validationSchema: toTypedSchema(createVehicleSchema),

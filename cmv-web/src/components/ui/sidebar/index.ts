@@ -1,4 +1,4 @@
-import { cva, type VariantProps } from 'class-variance-authority';
+import { type VariantProps, cva } from 'class-variance-authority';
 
 export { default as Sidebar } from './Sidebar.vue';
 export { default as SidebarContent } from './SidebarContent.vue';
@@ -45,7 +45,7 @@ export const sidebarMenuButtonVariants = cva(
       variant: 'default',
       size: 'default',
     },
-  },
+  }
 );
 
 export type SidebarMenuButtonVariants = VariantProps<typeof sidebarMenuButtonVariants>;

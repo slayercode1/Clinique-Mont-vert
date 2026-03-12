@@ -1,16 +1,30 @@
 <script lang="ts" setup>
-import { h, onMounted, ref } from 'vue';
-import { userStore } from '@/store/user.ts';
 import DataTable from '@/components/DataTable.vue';
-import { ColumnDef } from '@tanstack/vue-table';
-import { ArrowUpDown } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogFooter } from '@/components/ui/dialog';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import * as z from 'zod';
+import { userStore } from '@/store/user.ts';
+import { ColumnDef } from '@tanstack/vue-table';
 import { toTypedSchema } from '@vee-validate/zod';
+import { ArrowUpDown } from 'lucide-vue-next';
+import { h, onMounted, ref } from 'vue';
 import { toast } from 'vue-sonner';
+import * as z from 'zod';
 
 const isDialogOpen = ref(false);
 const user = userStore();
@@ -27,8 +41,7 @@ const closeDialog = () => {
   isDialogOpen.value = false;
 };
 
-const columns: ColumnDef<{ name: string }>[] = [
-
+const columns: ColumnDef<{ id: string; name: string }>[] = [
   {
     accessorKey: 'id',
     header: ({ column }) => {
@@ -38,7 +51,7 @@ const columns: ColumnDef<{ name: string }>[] = [
           variant: 'ghost',
           onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
         },
-        () => ['Identifiant', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })],
+        () => ['Identifiant', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]
       );
     },
     cell: ({ row }) => {
@@ -54,7 +67,7 @@ const columns: ColumnDef<{ name: string }>[] = [
           variant: 'ghost',
           onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
         },
-        () => ['Rôle', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })],
+        () => ['Nom du rôle', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]
       );
     },
     cell: ({ row }) => {
@@ -63,57 +76,59 @@ const columns: ColumnDef<{ name: string }>[] = [
   },
 ];
 
-
-const formSchema = toTypedSchema(z.object({
-  name: z.string(),
-}));
-
-function onSubmit(values: any) {
-  user.createRole(values).then(() => {
-    toast.success('Le rôle a été créé.', {
-      position: 'top-right',
-    });
+const formSchema = toTypedSchema(
+  z.object({
+    name: z.string().min(1, 'Le nom du rôle est requis'),
   })
-    .catch((error) => {
-      toast.error(error.message, {
-        position: 'top-right',
-      });
-    });
-  closeDialog();
-}
+);
 
+function onSubmit(values: { name: string }) {
+  user
+    .createRole(values)
+    .then(() => {
+      toast.success('Le rôle a été créé.', { position: 'top-right' });
+      closeDialog();
+    })
+    .catch((error: Error) => {
+      toast.error(error.message, { position: 'top-right' });
+    });
+}
 </script>
 
 <template>
   <div class="w-full">
     <div class="p-2 w-full md:w-[calc(100%-50px)] mt-8">
+      <h1 class="text-2xl font-bold mb-2">Paramètres</h1>
+      <p class="text-xl font-bold mb-4">Liste des rôles : {{ user.getRoles.length }}</p>
       <DataTable
         :click="openDialog"
         :columns="columns"
         :data="user.getRoles"
         btn_text="Ajouter un rôle"
-        permission-role="IT_ADMIN"
+        permission-role="SuperAdmin"
       />
-      <Form v-slot="{ handleSubmit }" :validation-schema="formSchema" as="" keep-values>
+
+      <Form v-slot="{ handleSubmit }" :validation-schema="formSchema" as="">
         <Dialog :open="isDialogOpen">
           <DialogContent :close="closeDialog" class="sm:max-w-[425px]">
-            <form id="dialogForm" @submit="handleSubmit($event, onSubmit)">
+            <DialogHeader>
+              <DialogTitle>Nouveau rôle</DialogTitle>
+              <DialogDescription>Remplissez le nom du rôle à créer.</DialogDescription>
+            </DialogHeader>
+            <form id="roleForm" @submit="handleSubmit($event, onSubmit)">
               <FormField v-slot="{ componentField }" name="name">
                 <FormItem>
-                  <FormLabel>Rôle</FormLabel>
+                  <FormLabel>Nom du rôle</FormLabel>
                   <FormControl>
-                    <Input placeholder="shadcn" type="text" v-bind="componentField" />
+                    <Input placeholder="Ex: FLEET_USER" type="text" v-bind="componentField" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               </FormField>
             </form>
-
             <DialogFooter>
-              <Button form="dialogForm" type="submit">
-                Ajouter
-
-              </Button>
+              <Button variant="outline" @click="closeDialog">Annuler</Button>
+              <Button form="roleForm" type="submit">Ajouter</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

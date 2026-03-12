@@ -1,11 +1,6 @@
 <script setup lang="ts">
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { AlertCircle, CheckCircle2, Clock, User } from 'lucide-vue-next';
-import { onBeforeMount } from 'vue';
-import { ticketStore } from '@/store/ticket.ts';
-import { useRoute } from 'vue-router';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,6 +8,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Separator } from '@/components/ui/separator';
+import { ticketStore } from '@/store/ticket.ts';
+import { AlertCircle, CheckCircle2, Clock, User } from 'lucide-vue-next';
+import { onBeforeMount } from 'vue';
+import { useRoute } from 'vue-router';
 import { toast } from 'vue-sonner';
 
 const ticket_store = ticketStore();
@@ -83,7 +83,7 @@ const stats = [
                 @click="
                   () => {
                     ticket_store.updateTicket({ status: item.value }, ticket_store.getTicket?.id!);
-                    toast.success('Ticket updated', {
+                    toast.success('Ticket mis à jour', {
                       position: 'top-right',
                     });
                   }

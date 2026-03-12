@@ -1,19 +1,20 @@
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
+import { getCache, invalidateCache, setCache } from '../../utils/cache.js';
 import prisma from '../../utils/prisma.js';
-import { ResourceType } from '../../utils/types/index.js';
+import type { ResourceType } from '../../utils/types/index.js';
 
-export const getResources = async (
-  _: Request,
-  response: Response,
-): Promise<any> => {
+const TTL = 300; // 5 minutes
+
+export const getResources = async (_: Request, response: Response): Promise<any> => {
   try {
-    const resources = await prisma.material.findMany({
-      where: {
-        deleted: false,
-      },
-    });
-    return response.status(200).json({ success: true, data: resources });
-  } catch (e) {
+    const cached = await getCache('resources');
+    if (cached) return response.status(200).json(cached);
+
+    const resources = await prisma.material.findMany({ where: { deleted: false } });
+    const payload = { success: true, data: resources };
+    await setCache('resources', payload, TTL);
+    return response.status(200).json(payload);
+  } catch (_e) {
     return response.status(500).json({
       success: false,
       message: 'Une erreur est survenue lors de la récupération des ressources',
@@ -21,31 +22,23 @@ export const getResources = async (
   }
 };
 
-export const getResource = async (
-  request: Request,
-  response: Response,
-): Promise<any> => {
+export const getResource = async (request: Request, response: Response): Promise<any> => {
   try {
     const id = request.params.id;
-    const resource = await prisma.material.findUnique({
-      where: {
-        id: id,
-      },
-    });
+    const cached = await getCache(`resource:${id}`);
+    if (cached) return response.status(200).json(cached);
 
+    const resource = await prisma.material.findUnique({ where: { id } });
     if (!resource) {
-      return response.status(404).json({
-        success: false,
-        message: 'La resource n\'a pas était trouver',
-      });
+      return response
+        .status(404)
+        .json({ success: false, message: "La resource n'a pas était trouver" });
     }
 
-    return response.status(200).json({
-      success: true,
-      data: resource,
-    });
-
-  } catch (e) {
+    const payload = { success: true, data: resource };
+    await setCache(`resource:${id}`, payload, TTL);
+    return response.status(200).json(payload);
+  } catch (_e) {
     return response.status(500).json({
       success: false,
       message: 'Une erreur est survenue lors de la récupération de la resource',
@@ -53,10 +46,7 @@ export const getResource = async (
   }
 };
 
-export const createResource = async (
-  request: Request,
-  response: Response,
-): Promise<any> => {
+export const createResource = async (request: Request, response: Response): Promise<any> => {
   try {
     const body = request.body as ResourceType;
     const newResource = await prisma.material.create({
@@ -71,19 +61,17 @@ export const createResource = async (
       },
     });
 
+    await invalidateCache('resources');
     return response.status(200).json({ success: true, data: newResource });
-  } catch (e) {
+  } catch (_e) {
     return response.status(500).json({
       success: false,
-      message: `Une erreur est survenue lors de la creation de la ressource`,
+      message: 'Une erreur est survenue lors de la creation de la ressource',
     });
   }
 };
 
-export const updateResource = async (
-  request: Request,
-  response: Response,
-): Promise<any> => {
+export const updateResource = async (request: Request, response: Response): Promise<any> => {
   const id = request.params.id;
   try {
     const body = request.body as Partial<ResourceType>;
@@ -96,7 +84,7 @@ export const updateResource = async (
     if (!resource)
       return response.status(404).json({
         success: false,
-        message: 'La ressource n\'a pas etait trouver ',
+        message: "La ressource n'a pas etait trouver ",
       });
 
     const resourceUpdate = await prisma.material.update({
@@ -108,8 +96,9 @@ export const updateResource = async (
       },
     });
 
+    await invalidateCache('resources', `resource:${id}`);
     return response.status(200).json({ success: true, data: resourceUpdate });
-  } catch (e) {
+  } catch (_e) {
     return response.status(500).json({
       success: false,
       message: `Une erreur est survenue lors de la modification de la ressource ${id}`,
@@ -117,10 +106,7 @@ export const updateResource = async (
   }
 };
 
-export const deleteResouce = async (
-  request: Request,
-  response: Response,
-): Promise<any> => {
+export const deleteResouce = async (request: Request, response: Response): Promise<any> => {
   try {
     const id = request.params.id;
 
@@ -133,7 +119,7 @@ export const deleteResouce = async (
     if (!material)
       return response.status(404).json({
         success: false,
-        message: 'La ressource n\'a pas etait trouver ',
+        message: "La ressource n'a pas etait trouver ",
       });
 
     await prisma.material.update({
@@ -143,14 +129,12 @@ export const deleteResouce = async (
       },
     });
 
+    await invalidateCache('resources', `resource:${id}`);
     return response.status(200).json({ success: true, message: 'La ressource a était supprimer' });
-
-
-  } catch (error) {
+  } catch (_error) {
     return response.status(500).json({
       success: false,
-      message:
-        'Une erreur est survenue lors de la suppression de la ressource',
+      message: 'Une erreur est survenue lors de la suppression de la ressource',
     });
   }
 };

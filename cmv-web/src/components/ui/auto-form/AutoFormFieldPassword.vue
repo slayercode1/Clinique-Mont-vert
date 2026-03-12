@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import type { FieldProps } from './interface';
+import { LucideEye, LucideEyeOff } from 'lucide-vue-next';
+import { computed, ref } from 'vue';
 import { FormControl, FormDescription, FormField, FormItem, FormMessage } from '../form';
 import { Input } from '../input';
 import { Textarea } from '../textarea';
-import { computed, ref } from 'vue';
 import AutoFormLabel from './AutoFormLabel.vue';
-import { LucideEye, LucideEyeOff } from 'lucide-vue-next';
+import type { FieldProps } from './interface';
 import { beautifyObjectName } from './utils';
 
 const props = defineProps<FieldProps>();
 const inputComponent: any = computed(() =>
-  props.config?.component === 'textarea' ? Textarea : Input,
+  props.config?.component === 'textarea' ? Textarea : Input
 );
 
 const isPasswordVisible = ref<boolean>(true);

@@ -1,27 +1,23 @@
-import { Request, Response } from 'express';
-import prisma from '../../utils/prisma.js';
-import { TicketType } from '../../utils/types/index.js';
+import type { Request, Response } from 'express';
+import { getCache, invalidateCache, setCache } from '../../utils/cache.js';
 import { render } from '../../utils/edge.js';
 import { transporter } from '../../utils/mailer.js';
+import prisma from '../../utils/prisma.js';
+import type { TicketType } from '../../utils/types/index.js';
 
-export const getTickets = async (
-  _: Request,
-  response: Response
-): Promise<any> => {
+export const getTickets = async (_: Request, response: Response): Promise<any> => {
   try {
+    const cached = await getCache('tickets');
+    if (cached) return response.status(200).json(cached);
+
     const tickets = await prisma.ticket.findMany({
-      include: {
-        material: true,
-        employee: true,
-        resolvedBy: true,
-        assign: true,
-      },
-      where: {
-        deleted: false,
-      },
+      include: { material: true, employee: true, resolvedBy: true, assign: true },
+      where: { deleted: false },
     });
-    return response.status(200).json({ success: true, data: tickets });
-  } catch (e) {
+    const payload = { success: true, data: tickets };
+    await setCache('tickets', payload, 60); // 1 minute — données dynamiques
+    return response.status(200).json(payload);
+  } catch (_e) {
     return response.status(500).json({
       success: false,
       message: 'Une erreur est survenue lors de la récupération des tickets',
@@ -29,10 +25,7 @@ export const getTickets = async (
   }
 };
 
-export const getTicket = async (
-  request: Request,
-  response: Response
-): Promise<any> => {
+export const getTicket = async (request: Request, response: Response): Promise<any> => {
   const id = request.params.id;
   try {
     const ticket = await prisma.ticket.findUnique({
@@ -54,7 +47,7 @@ export const getTicket = async (
       });
 
     return response.status(200).json({ success: true, data: ticket });
-  } catch (e) {
+  } catch (_e) {
     return response.status(500).json({
       success: false,
       message: 'Une erreur est survenue lors de la récupération des tickets',
@@ -62,10 +55,7 @@ export const getTicket = async (
   }
 };
 
-export const createTicket = async (
-  request: Request,
-  response: Response
-): Promise<any> => {
+export const createTicket = async (request: Request, response: Response): Promise<any> => {
   try {
     const body = request.body as TicketType;
 
@@ -96,19 +86,17 @@ export const createTicket = async (
       },
     });
 
+    await invalidateCache('tickets');
     return response.status(200).json({ success: true, data: newTicket });
-  } catch (e) {
+  } catch (_e) {
     return response.status(500).json({
       success: false,
-      message: `Une erreur est survenue lors de la creation du ticket`,
+      message: 'Une erreur est survenue lors de la creation du ticket',
     });
   }
 };
 
-export const updateTicket = async (
-  request: Request,
-  response: Response
-): Promise<any> => {
+export const updateTicket = async (request: Request, response: Response): Promise<any> => {
   const id = request.params.id;
   try {
     const body = request.body as Partial<TicketType>;
@@ -183,7 +171,7 @@ export const updateTicket = async (
             sendemail(
               'client-task-approval-status.edge',
               data,
-              data.resolvedBy!.email,
+              data.resolvedBy?.email,
               ' Statut de la tâche - Validée  par le client',
               response
             );
@@ -214,14 +202,14 @@ export const updateTicket = async (
             sendemail(
               'client-task-approval-status.edge',
               data,
-              data.resolvedBy!.email,
+              data.resolvedBy?.email,
               ' Statut de la tâche - Refusée par le client',
               response
             );
             return response.status(200).json({ success: true, data });
           });
 
-      default:
+      default: {
         const update = await prisma.ticket.update({
           where: {
             id: ticket.id,
@@ -241,9 +229,11 @@ export const updateTicket = async (
             material: true,
           },
         });
+        await invalidateCache('tickets', `ticket:${id}`);
         return response.status(200).json({ success: true, data: update });
+      }
     }
-  } catch (error) {
+  } catch (_error) {
     return response.status(500).json({
       success: false,
       message: `Une erreur est survenue lors de la modification du ticket n° ${id}`,
@@ -291,10 +281,7 @@ export async function sendemail(
   }
 }
 
-export const deleteTicket = async (
-  request: Request,
-  response: Response
-): Promise<any> => {
+export const deleteTicket = async (request: Request, response: Response): Promise<any> => {
   try {
     const id = request.params.id;
 
@@ -317,10 +304,9 @@ export const deleteTicket = async (
       },
     });
 
-    return response
-      .status(200)
-      .json({ success: true, message: 'Le ticket a était supprimer' });
-  } catch (error) {
+    await invalidateCache('tickets', `ticket:${id}`);
+    return response.status(200).json({ success: true, message: 'Le ticket a était supprimer' });
+  } catch (_error) {
     return response.status(500).json({
       success: false,
       message: 'Une erreur est survenue lors de la suppression du ticket',

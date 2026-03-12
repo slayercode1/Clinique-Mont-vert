@@ -1,5 +1,5 @@
 import type { Component, InputHTMLAttributes } from 'vue';
-import type { z, ZodAny } from 'zod';
+import type { ZodAny, z } from 'zod';
 import type { INPUT_COMPONENTS } from './constant';
 
 export interface FieldProps {
@@ -43,10 +43,10 @@ export type Config<SchemaType extends object> = {
 };
 
 export enum DependencyType {
-  DISABLES,
-  REQUIRES,
-  HIDES,
-  SETS_OPTIONS,
+  DISABLES = 0,
+  REQUIRES = 1,
+  HIDES = 2,
+  SETS_OPTIONS = 3,
 }
 
 interface BaseDependency<SchemaType extends z.infer<z.ZodObject<any, any>>> {

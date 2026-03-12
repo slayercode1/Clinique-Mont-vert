@@ -1,5 +1,6 @@
+import { STORAGE_KEY } from '@/utils/storage';
+import type { CostType, VehicleType } from '@/utils/types';
 import { defineStore } from 'pinia';
-import { CostType, VehicleType } from '@/utils/types';
 import { API_ENDPOINT } from './api-endpoint';
 
 export const fleetStore = defineStore('fleet', {
@@ -26,7 +27,7 @@ export const fleetStore = defineStore('fleet', {
       try {
         const response = await fetch(`${API_ENDPOINT}/fleet/vehicles`, {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('ssid')}`,
+            Authorization: `Bearer ${localStorage.getItem(STORAGE_KEY)}`,
             'Content-Type': 'application/json',
           },
         });
@@ -41,14 +42,14 @@ export const fleetStore = defineStore('fleet', {
       try {
         const response = await fetch(`${API_ENDPOINT}/fleet/vehicle/${id}`, {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('ssid')}`,
+            Authorization: `Bearer ${localStorage.getItem(STORAGE_KEY)}`,
             'Content-Type': 'application/json',
           },
         });
         const { data } = await response.json();
         this.fleet = data;
       } catch (error) {
-        console.error('Error fetching costs:', error);
+        console.error('Error fetching fleets:', error);
       }
     },
 
@@ -56,7 +57,7 @@ export const fleetStore = defineStore('fleet', {
       try {
         const response = await fetch(`${API_ENDPOINT}/fleet/vehicle_cost/${id}`, {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('ssid')}`,
+            Authorization: `Bearer ${localStorage.getItem(STORAGE_KEY)}`,
             'Content-Type': 'application/json',
           },
         });
@@ -71,7 +72,7 @@ export const fleetStore = defineStore('fleet', {
       const response = await fetch(`${API_ENDPOINT}/fleet/create-vehicle`, {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('ssid')}`,
+          Authorization: `Bearer ${localStorage.getItem(STORAGE_KEY)}`,
           'Content-Type': 'application/json', // optional, depending on the API requirements
         },
         body: JSON.stringify(vehicle),
@@ -88,7 +89,7 @@ export const fleetStore = defineStore('fleet', {
       const response = await fetch(`${API_ENDPOINT}/fleet/create-cost`, {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('ssid')}`,
+          Authorization: `Bearer ${localStorage.getItem(STORAGE_KEY)}`,
           'Content-Type': 'application/json', // optional, depending on the API requirements
         },
         body: JSON.stringify(cost),
@@ -105,7 +106,7 @@ export const fleetStore = defineStore('fleet', {
       const response = await fetch(`${API_ENDPOINT}/fleet/update-vehicle/${id}`, {
         method: 'PATCH',
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('ssid')}`,
+          Authorization: `Bearer ${localStorage.getItem(STORAGE_KEY)}`,
           'Content-Type': 'application/json', // optional, depending on the API requirements
         },
         body: JSON.stringify(vehicle),
@@ -114,7 +115,9 @@ export const fleetStore = defineStore('fleet', {
       if (!response.ok) {
         throw new Error(data.message);
       }
-      this.fleets = this.fleets.map((fleet: any) => (fleet.id === data.id ? data : fleet));
+      this.fleets = this.fleets.map((fleet: VehicleType & { id?: string }) =>
+        fleet.id === data.id ? data : fleet
+      );
       return data;
     },
 
@@ -122,13 +125,15 @@ export const fleetStore = defineStore('fleet', {
       const response = await fetch(`${API_ENDPOINT}/fleet/delete-cost/${id}`, {
         method: 'DELETE',
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('ssid')}`,
+          Authorization: `Bearer ${localStorage.getItem(STORAGE_KEY)}`,
           'Content-Type': 'application/json',
         },
       });
 
       if (response.ok) {
-        this.costs = this.costs.filter(cost => (cost as any).id !== id);
+        this.costs = this.costs.filter(
+          (cost: CostType) => (cost as CostType & { id?: string }).id !== id
+        );
       } else {
         console.error('Erreur lors de la suppression du coût:', response.statusText);
       }
@@ -138,13 +143,15 @@ export const fleetStore = defineStore('fleet', {
       const response = await fetch(`${API_ENDPOINT}/fleet/delete-vehicle/${id}`, {
         method: 'DELETE',
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('ssid')}`,
+          Authorization: `Bearer ${localStorage.getItem(STORAGE_KEY)}`,
           'Content-Type': 'application/json',
         },
       });
 
       if (response.ok) {
-        this.fleets = this.fleets.filter(vehicle => (vehicle as any).id !== id);
+        this.fleets = this.fleets.filter(
+          (vehicle: VehicleType & { id?: string }) => vehicle.id !== id
+        );
       } else {
         console.error('Erreur lors de la suppression du véhicule:', response.statusText);
       }

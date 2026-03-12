@@ -1,7 +1,13 @@
-import * as bcrypt from 'bcrypt';
+import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
+import * as dotenv from 'dotenv';
+import pg from 'pg';
+dotenv.config({ quiet: true });
 
-const prisma = new PrismaClient()
+const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
+const adapter = new PrismaPg(pool as any);
+const prisma = new PrismaClient({ adapter });
 
 async function createRoles() {
   // Crée les rôles
@@ -74,7 +80,7 @@ async function main() {
 
   // Associe chaque permission au rôle SuperAdmin
   const permissionOnRolesData = permissions.map((permission) => ({
-    roleId: superAdminRole!.id,
+    roleId: superAdminRole?.id,
     permissionId: permission.id,
   }));
 
@@ -98,7 +104,7 @@ async function main() {
       email: 'support@technique.com',
       password: passwordHash,
       status: 'ACTIF',
-      roleId: superAdminRole!.id,
+      roleId: superAdminRole?.id,
       serviceId: service.id,
       isChangePassword: true,
     },

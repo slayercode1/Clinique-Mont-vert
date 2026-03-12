@@ -1,11 +1,8 @@
 <script lang="ts" setup>
-import { h, onBeforeMount } from 'vue';
 import DataTable from '@/components/DataTable.vue';
-import { ColumnDef } from '@tanstack/vue-table';
-import { useRouter } from 'vue-router';
+import DropdownAction from '@/components/data-table-dropdown.vue';
+import Badge from '@/components/ui/badge/Badge.vue';
 import Button from '@/components/ui/button/Button.vue';
-import { ArrowUpDown } from 'lucide-vue-next';
-import { fleetStore } from '@/store/fleet.ts';
 import { Card } from '@/components/ui/card';
 import {
   DropdownMenu,
@@ -13,12 +10,19 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import Badge from '@/components/ui/badge/Badge.vue';
-import DropdownAction from '@/components/data-table-dropdown.vue';
+import { fleetStore } from '@/store/fleet.ts';
 import { VehicleType } from '@/utils/types';
+import { ColumnDef } from '@tanstack/vue-table';
+import { ArrowUpDown } from 'lucide-vue-next';
+import { h, onBeforeMount, ref } from 'vue';
+import FormAddDialog from './FormAddDialog.vue';
+import FormEditDialog from './FormEditDialog.vue';
 
 const vehicle = fleetStore();
-const router = useRouter();
+
+const showAddDialog = ref(false);
+const showEditDialog = ref(false);
+const selectedVehicleId = ref<string | null>(null);
 
 onBeforeMount(async () => {
   await vehicle.fetchFleets();
@@ -26,6 +30,22 @@ onBeforeMount(async () => {
 
 const handleDelete = async (id: string) => {
   await vehicle.deleteVehicle(id);
+};
+
+const openEditDialog = (id: string) => {
+  selectedVehicleId.value = id;
+  showEditDialog.value = true;
+};
+
+const closeEditDialog = () => {
+  showEditDialog.value = false;
+  selectedVehicleId.value = null;
+  vehicle.fetchFleets();
+};
+
+const closeAddDialog = () => {
+  showAddDialog.value = false;
+  vehicle.fetchFleets();
 };
 
 const columns: ColumnDef<VehicleType & { id?: string }>[] = [
@@ -38,7 +58,7 @@ const columns: ColumnDef<VehicleType & { id?: string }>[] = [
           variant: 'ghost',
           onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
         },
-        () => ['Marque', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })],
+        () => ['Marque', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]
       );
     },
     cell: ({ row }) => {
@@ -54,7 +74,7 @@ const columns: ColumnDef<VehicleType & { id?: string }>[] = [
           variant: 'ghost',
           onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
         },
-        () => ['Modèle', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })],
+        () => ['Modèle', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]
       );
     },
     cell: ({ row }) => {
@@ -71,7 +91,7 @@ const columns: ColumnDef<VehicleType & { id?: string }>[] = [
           variant: 'ghost',
           onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
         },
-        () => ['Année', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })],
+        () => ['Année', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]
       );
     },
     cell: ({ row }) => {
@@ -87,7 +107,7 @@ const columns: ColumnDef<VehicleType & { id?: string }>[] = [
           variant: 'ghost',
           onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
         },
-        () => ['Kilométrage', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })],
+        () => ['Kilométrage', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]
       );
     },
     cell: ({ row }) => {
@@ -103,7 +123,7 @@ const columns: ColumnDef<VehicleType & { id?: string }>[] = [
           variant: 'ghost',
           onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
         },
-        () => ['Statut', h(ArrowUpDown, { class: 'ml-2 h-4 w-4 text-center' })],
+        () => ['Statut', h(ArrowUpDown, { class: 'ml-2 h-4 w-4 text-center' })]
       );
     },
     cell: ({ row }) => {
@@ -119,7 +139,7 @@ const columns: ColumnDef<VehicleType & { id?: string }>[] = [
         {
           class: `font-medium ${(stateStyles as any)[state] || 'bg-gray-200 text-black'}`,
         },
-        state.replace('_', ' '), // Affiche l'état de manière lisible (ex. "IN_USE" devient "In Use")
+        state.replace('_', ' ')
       );
       return h(
         'div',
@@ -132,7 +152,7 @@ const columns: ColumnDef<VehicleType & { id?: string }>[] = [
                 e.stopPropagation();
               },
             },
-            [badge],
+            [badge]
           ),
           h(DropdownMenuContent, [
             h(
@@ -140,24 +160,24 @@ const columns: ColumnDef<VehicleType & { id?: string }>[] = [
               {
                 onClick: () => vehicle.updateFleet({ state: 'IN_USE' }, row.original?.id!),
               },
-              'In Use',
+              'En service'
             ),
             h(
               DropdownMenuItem,
               {
                 onClick: () => vehicle.updateFleet({ state: 'AVAILABLE' }, row.original?.id!),
               },
-              'AVAILABLE',
+              'Disponible'
             ),
             h(
               DropdownMenuItem,
               {
                 onClick: () => vehicle.updateFleet({ state: 'IN_REPAIR' }, row.original?.id!),
               },
-              'In Repair',
+              'En réparation'
             ),
           ]),
-        ]),
+        ])
       );
     },
   },
@@ -170,7 +190,7 @@ const columns: ColumnDef<VehicleType & { id?: string }>[] = [
           variant: 'ghost',
           onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
         },
-        () => ['Dernière maintenance', h(ArrowUpDown, { class: 'ml-2 h-4 w-4 text-center' })],
+        () => ['Dernière maintenance', h(ArrowUpDown, { class: 'ml-2 h-4 w-4 text-center' })]
       );
     },
     cell: ({ row }) => {
@@ -179,11 +199,11 @@ const columns: ColumnDef<VehicleType & { id?: string }>[] = [
         { class: 'font-medium' },
         row.getValue('maintenance_date') !== null
           ? new Intl.DateTimeFormat('fr-FR', {
-            year: 'numeric',
-            month: 'long',
-            day: '2-digit',
-          }).format(new Date(row.getValue('maintenance_date')))
-          : '--',
+              year: 'numeric',
+              month: 'long',
+              day: '2-digit',
+            }).format(new Date(row.getValue('maintenance_date')))
+          : '--'
       );
     },
   },
@@ -191,17 +211,18 @@ const columns: ColumnDef<VehicleType & { id?: string }>[] = [
     id: 'actions',
     enableHiding: false,
     cell: ({ row }) => {
-      const vehicle = row.original as VehicleType & { id: string };
+      const v = row.original as VehicleType & { id: string };
       return h(
         'div',
         { class: 'relative' },
         h(DropdownAction, {
-          data: vehicle,
-          url_detail: `/costs-list/${vehicle.id}`,
-          url: `fleet-update/${vehicle.id}`,
+          data: v,
+          url_detail: `/costs-list/${v.id}`,
+          url_update: true,
           detail: true,
-          handleDelete: () => handleDelete(vehicle.id),
-        }),
+          handleDelete: () => handleDelete(v.id),
+          onViewUpdate: () => openEditDialog(v.id),
+        })
       );
     },
   },
@@ -238,7 +259,7 @@ const columns: ColumnDef<VehicleType & { id?: string }>[] = [
         </div>
       </div>
       <DataTable
-        :click="() => router.push('/fleet-add')"
+        :click="() => (showAddDialog = true)"
         :columns="columns"
         :data="vehicle.getFleets"
         btn_text="Ajouter un Véhicule"
@@ -246,4 +267,7 @@ const columns: ColumnDef<VehicleType & { id?: string }>[] = [
       />
     </div>
   </div>
+
+  <FormAddDialog :open="showAddDialog" @close="closeAddDialog" />
+  <FormEditDialog :open="showEditDialog" :vehicle-id="selectedVehicleId" @close="closeEditDialog" />
 </template>

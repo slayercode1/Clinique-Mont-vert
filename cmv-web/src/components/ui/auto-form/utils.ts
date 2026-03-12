@@ -34,7 +34,7 @@ export function getIndexIfArray(string: string) {
  * This will unpack optionals, refinements, etc.
  */
 export function getBaseSchema<ChildType extends z.ZodAny | z.AnyZodObject = z.ZodAny>(
-  schema: ChildType | z.ZodEffects<ChildType>,
+  schema: ChildType | z.ZodEffects<ChildType>
 ): ChildType | null {
   if (!schema) return null;
   if ('innerType' in schema._def) return getBaseSchema(schema._def.innerType as ChildType);
@@ -50,7 +50,9 @@ export function getBaseSchema<ChildType extends z.ZodAny | z.AnyZodObject = z.Zo
  */
 export function getBaseType(schema: z.ZodAny) {
   const baseSchema = getBaseSchema(schema);
-  return baseSchema ? baseSchema._def.typeName : '';
+  if (!baseSchema) return '';
+  // Zod v4 uses _def.type (lowercase), v3 uses _def.typeName
+  return (baseSchema._def as any).typeName ?? (baseSchema._def as any).type ?? '';
 }
 
 /**
@@ -58,8 +60,10 @@ export function getBaseType(schema: z.ZodAny) {
  */
 export function getDefaultValueInZodStack(schema: z.ZodAny): any {
   const typedSchema = schema as unknown as z.ZodDefault<z.ZodNumber | z.ZodString>;
+  const defTypeName = (typedSchema._def as any).typeName ?? (typedSchema._def as any).type;
 
-  if (typedSchema._def.typeName === 'ZodDefault') return typedSchema._def.defaultValue();
+  if (defTypeName === 'ZodDefault' || defTypeName === 'default')
+    return (typedSchema._def as any).defaultValue();
 
   if ('innerType' in typedSchema._def) {
     return getDefaultValueInZodStack(typedSchema._def.innerType as unknown as z.ZodAny);
@@ -72,9 +76,10 @@ export function getDefaultValueInZodStack(schema: z.ZodAny): any {
 }
 
 export function getObjectFormSchema(schema: ZodObjectOrWrapped): z.ZodObject<any, any> {
-  if (schema?._def.typeName === 'ZodEffects') {
+  const defTypeName = (schema?._def as any)?.typeName ?? (schema?._def as any)?.type;
+  if (defTypeName === 'ZodEffects' || defTypeName === 'pipe') {
     const typedSchema = schema as z.ZodEffects<z.ZodObject<any, any>>;
-    return getObjectFormSchema(typedSchema._def.schema);
+    return getObjectFormSchema((typedSchema._def as any).schema ?? (typedSchema._def as any).in);
   }
   return schema as z.ZodObject<any, any>;
 }
@@ -126,17 +131,17 @@ function cleanupNonNestedPath(path: string) {
  */
 export function getFromPath<TValue = unknown>(
   object: NestedRecord | undefined,
-  path: string,
+  path: string
 ): TValue | undefined;
 export function getFromPath<TValue = unknown, TFallback = TValue>(
   object: NestedRecord | undefined,
   path: string,
-  fallback?: TFallback,
+  fallback?: TFallback
 ): TValue | TFallback;
 export function getFromPath<TValue = unknown, TFallback = TValue>(
   object: NestedRecord | undefined,
   path: string,
-  fallback?: TFallback,
+  fallback?: TFallback
 ): TValue | TFallback | undefined {
   if (!object) return fallback;
 

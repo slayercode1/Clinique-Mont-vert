@@ -1,5 +1,27 @@
 <script generic="TData extends Record<string, any>, TValue" lang="ts" setup>
-import type { ColumnDef, ColumnFiltersState, SortingState, VisibilityState } from '@tanstack/vue-table';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { valueUpdater } from '@/lib/utils';
+import { authStore } from '@/store/auth.ts';
+import type {
+  ColumnDef,
+  ColumnFiltersState,
+  SortingState,
+  VisibilityState,
+} from '@tanstack/vue-table';
 import {
   FlexRender,
   getCoreRowModel,
@@ -8,19 +30,9 @@ import {
   getSortedRowModel,
   useVueTable,
 } from '@tanstack/vue-table';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight } from 'lucide-vue-next';
-import { Input } from './ui/input';
+import { ChevronLeft, ChevronRight, SearchX } from 'lucide-vue-next';
 import { ref } from 'vue';
-import { valueUpdater } from '@/lib/utils';
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { authStore } from '@/store/auth.ts';
+import { Input } from './ui/input';
 
 const props = defineProps<{
   columns: ColumnDef<TData, TValue>[];
@@ -75,7 +87,7 @@ const auth = authStore();
   <div>
     <div class="flex justify-between items-center my-2">
       <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between lg:w-full">
-        <Button v-if="auth.getUser?.role.name === permissionRole || 'SuperAdmin'" @click="click">{{
+        <Button v-if="auth.getUser?.role.name === permissionRole || auth.getUser?.role.name === 'SuperAdmin'" @click="click">{{
             props.btn_text
           }}
         </Button>
@@ -83,13 +95,13 @@ const auth = authStore();
           <Input
             :model-value="globalFilter ?? ''"
             class="max-w-sm"
-            placeholder="Recheche..."
+            placeholder="Rechercher..."
             @update:modelValue="(value) => (globalFilter = String(value))"
           />
           <DropdownMenu>
             <DropdownMenuTrigger as-child>
               <Button class="ml-auto" variant="outline">
-                Columns
+                Colonnes
                 <ChevronDown class="w-4 h-4 ml-2" />
               </Button>
             </DropdownMenuTrigger>
@@ -138,7 +150,13 @@ const auth = authStore();
         </template>
         <template v-else>
           <TableRow>
-            <TableCell :colspan="columns.length" class="h-24 text-center"> No results.</TableCell>
+            <TableCell :colspan="columns.length" class="h-40 text-center">
+              <div class="flex flex-col items-center justify-center gap-2 text-muted-foreground">
+                <SearchX class="w-10 h-10 opacity-40" />
+                <p class="text-base font-semibold text-gray-700">Aucun résultat</p>
+                <p class="text-sm text-gray-400">Aucune donnée à afficher pour le moment.</p>
+              </div>
+            </TableCell>
           </TableRow>
         </template>
       </TableBody>

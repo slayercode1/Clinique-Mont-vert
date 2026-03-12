@@ -1,16 +1,5 @@
 <script lang="ts" setup>
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from '@/components/ui/sidebar';
-import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -21,7 +10,20 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from '@/components/ui/sidebar';
+import FormsDialog from '@/pages/tickets/FormsDialog.vue';
 import { HelpCircle, LogOut } from 'lucide-vue-next';
+import { ref } from 'vue';
 import { RouterLink, useRouter } from 'vue-router';
 import logo from '../assets/logo2.png';
 import { authStore } from '../store/auth';
@@ -30,6 +32,8 @@ import { useTokenStore } from '../store/token';
 const session = authStore();
 const token = useTokenStore();
 const router = useRouter();
+
+const showTicketDialog = ref(false);
 
 defineProps({
   menu: Array<Record<string, string>>,
@@ -78,7 +82,7 @@ const handleLogout = async () => {
               session.getUser?.role.name !== 'IT_USER' && session.getUser?.role.name !== 'IT_ADMIN'
             "
             class="w-40 cursor-pointer"
-            @click="() => router.push('/ticket-add')"
+            @click="showTicketDialog = true"
           >
             <div class="flex gap-2">
               <HelpCircle />
@@ -100,7 +104,7 @@ const handleLogout = async () => {
     <AlertDialogContent>
       <AlertDialogHeader>
         <AlertDialogTitle>Êtes-vous absolument sûr ?</AlertDialogTitle>
-        <AlertDialogDescription> Vous ête sur le point de vous deconnecter </AlertDialogDescription>
+        <AlertDialogDescription>Vous êtes sur le point de vous déconnecter.</AlertDialogDescription>
       </AlertDialogHeader>
       <AlertDialogFooter>
         <AlertDialogCancel>Annuler</AlertDialogCancel>
@@ -108,4 +112,6 @@ const handleLogout = async () => {
       </AlertDialogFooter>
     </AlertDialogContent>
   </AlertDialog>
+
+  <FormsDialog :open="showTicketDialog" @close="showTicketDialog = false" />
 </template>

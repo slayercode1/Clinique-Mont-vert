@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Select,
   SelectContent,
@@ -15,15 +16,13 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Button } from '@/components/ui/button';
 import { userStore } from '@/store/user';
-import { toast } from 'vue-sonner';
 import { Payload } from '@/utils/types';
+import { onMounted, ref } from 'vue';
+import { toast } from 'vue-sonner';
 
 const user = userStore();
 
-// Liste statique des ressources
 const allResources = [
   'resource',
   'user',
@@ -35,28 +34,39 @@ const allResources = [
   'vehicle_detail',
 ];
 
-// Actions possibles
+const resourceLabels: Record<string, string> = {
+  resource: 'Ressource',
+  user: 'Utilisateur',
+  ticket: 'Ticket',
+  ticket_detail: 'Détail ticket',
+  vehicle: 'Véhicule',
+  cost_vehicle: 'Coût véhicule',
+  cost: 'Coût',
+  vehicle_detail: 'Détail véhicule',
+};
+
 const actions = ['read', 'edit', 'add', 'delete'];
-// État réactif pour les permissions
+
+const actionLabels: Record<string, string> = {
+  read: 'Lecture',
+  edit: 'Modifier',
+  add: 'Ajouter',
+  delete: 'Supprimer',
+};
+
 const permissionsData = ref({});
 const selectedRole = ref('SuperAdmin');
-// const newRoleName = ref('');
 
-// Charger les données initiales
 onMounted(async () => {
   await user.fetchRoles();
   await user.fetchPermissions();
-
-  // Copie profonde des permissions
   permissionsData.value = JSON.parse(JSON.stringify(user.getPermissions));
 });
 
-// Vérifier si une permission existe
 const hasPermission = (role: string, resource: string, action: string) => {
   return permissionsData.value[role]?.[resource]?.includes(action) || false;
 };
 
-// Basculer une permission
 const togglePermission = (role: string, resource: string, action: string) => {
   if (!permissionsData.value[role]) {
     permissionsData.value[role] = {};
@@ -76,76 +86,76 @@ const togglePermission = (role: string, resource: string, action: string) => {
 };
 
 const savePermissions = async () => {
-
   const payload: Payload = {
     roleId: user.getRoles.find((role) => role.name === selectedRole.value)?.id || '',
     permissions: Object.entries(permissionsData.value[selectedRole.value] || {}).map(
       ([resource, actions]) => ({
         resource,
         actions,
-      }),
+      })
     ),
   };
 
   try {
     await user.createOrUpdatePermission(payload);
-    // Ajouter un toast de succès
-    toast.success('Permissions sauvegardées avec succès.', {
-      position: 'top-right',
-    });
+    toast.success('Permissions sauvegardées avec succès.', { position: 'top-right' });
   } catch (error) {
-    // Gérer les erreurs
-    console.error('Erreur lors de la sauvegarde', error);
-    toast.error('Erreur lors de la sauvegarde des permissions.', {
-      position: 'top-right',
-    });
+    toast.error('Erreur lors de la sauvegarde des permissions.', { position: 'top-right' });
   }
 };
 </script>
 
 <template>
-  <div class="p-6 space-y-4 w-full">
-    <div class="flex items-center space-x-4">
-      <span class="font-medium">Sélectionner un rôle :</span>
-      <Select v-model="selectedRole">
-        <SelectTrigger class="w-[180px]">
-          <SelectValue placeholder="Choisir un rôle" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem v-for="role in user.getRoles" :key="role.id" :value="role.name">
-            {{ role.name.charAt(0).toUpperCase() + role.name.slice(1) }}
-          </SelectItem>
-        </SelectContent>
-      </Select>
-    </div>
+  <div class="w-full">
+    <div class="p-2 w-full md:w-[calc(100%-50px)] mt-8">
+      <h1 class="text-2xl font-bold mb-2">Paramètres</h1>
+      <p class="text-xl font-bold mb-6">Gestion des permissions</p>
 
-    <Table v-if="selectedRole">
-      <TableHeader>
-        <TableRow>
-          <TableHead>Ressources</TableHead>
-          <TableHead v-for="action in actions" :key="action" class="text-center">
-            {{ action.charAt(0).toUpperCase() + action.slice(1) }}
-          </TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        <TableRow v-for="resource in allResources" :key="resource">
-          <TableCell class="font-medium">
-            {{ resource.charAt(0).toUpperCase() + resource.slice(1) }}
-          </TableCell>
-          <TableCell v-for="action in actions" :key="action" class="text-center">
-            <Checkbox
-              :checked="hasPermission(selectedRole, resource, action)"
-              @update:checked="() => togglePermission(selectedRole, resource, action)"
-            />
-          </TableCell>
-        </TableRow>
-      </TableBody>
-    </Table>
+      <div class="flex items-center gap-3 mb-6">
+        <span class="font-medium text-sm">Rôle :</span>
+        <Select v-model="selectedRole">
+          <SelectTrigger class="w-[200px]">
+            <SelectValue placeholder="Choisir un rôle" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem v-for="role in user.getRoles" :key="role.id" :value="role.name">
+              {{ role.name }}
+            </SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
-    <!-- Bouton de sauvegarde -->
-    <div v-if="selectedRole" class="mt-4">
-      <Button variant="default" @click="savePermissions"> Sauvegarder les permissions </Button>
+      <Table v-if="selectedRole">
+        <TableHeader>
+          <TableRow>
+            <TableHead class="font-semibold">Ressource</TableHead>
+            <TableHead
+              v-for="action in actions"
+              :key="action"
+              class="text-center font-semibold"
+            >
+              {{ actionLabels[action] }}
+            </TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          <TableRow v-for="resource in allResources" :key="resource">
+            <TableCell class="font-medium">
+              {{ resourceLabels[resource] }}
+            </TableCell>
+            <TableCell v-for="action in actions" :key="action" class="text-center">
+              <Checkbox
+                :checked="hasPermission(selectedRole, resource, action)"
+                @update:checked="() => togglePermission(selectedRole, resource, action)"
+              />
+            </TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
+
+      <div v-if="selectedRole" class="mt-6">
+        <Button variant="default" @click="savePermissions">Sauvegarder les permissions</Button>
+      </div>
     </div>
   </div>
 </template>

@@ -1,5 +1,5 @@
-import { z, ZodError } from 'zod';
-import { NextFunction, Request, Response } from 'express';
+import type { NextFunction, Request, Response } from 'express';
+import { ZodError, type z } from 'zod';
 
 // Middleware pour valider les données de la requête à l'aide de Zod
 export function validateData(schema: z.ZodObject<any, any>) {
@@ -13,7 +13,7 @@ export function validateData(schema: z.ZodObject<any, any>) {
       // Gestion des erreurs si la validation échoue
       if (error instanceof ZodError) {
         // Si l'erreur est une ZodError, on formate les messages d'erreur
-        const errorMessages = error.errors.map((issue: any) => ({
+        const errorMessages = error.issues.map((issue: any) => ({
           message: `${issue.path.join('.')} is ${issue.message}`,
         }));
         // Renvoie une réponse avec statut 400 et les détails des erreurs

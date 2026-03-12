@@ -1,15 +1,12 @@
-import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import type { Request, Response } from 'express';
+import jwt from 'jsonwebtoken';
 import prisma from '../../utils/prisma.js';
 
-dotenv.config();
+dotenv.config({ quiet: true });
 
-export const signIn = async (
-  request: Request,
-  response: Response
-): Promise<any> => {
+export const signIn = async (request: Request, response: Response): Promise<any> => {
   const { email, password: p } = request.body as {
     email: string;
     password: string;
@@ -39,9 +36,7 @@ export const signIn = async (
           },
         },
       })
-      .catch((err: any) => {
-        console.log(err);
-      });
+      .catch((_err: any) => {});
 
     if (!accountExist)
       return response.status(400).json({
@@ -88,18 +83,15 @@ export const signIn = async (
         token: accessToken,
       },
     });
-  } catch (e) {
+  } catch (_e) {
     return response.status(500).json({
       success: false,
-      message: `Une erreur est survenue lors de la connexion`,
+      message: 'Une erreur est survenue lors de la connexion',
     });
   }
 };
 
-export const signOut = async (
-  request: Request,
-  response: Response
-): Promise<any> => {
+export const signOut = async (request: Request, response: Response): Promise<any> => {
   try {
     const id = request.params.id;
     const user = await prisma.user.findUnique({
@@ -119,18 +111,15 @@ export const signOut = async (
       success: true,
       message: 'User is logout',
     });
-  } catch (e) {
+  } catch (_e) {
     return response.status(500).json({
       success: false,
-      message: `Une erreur est survenue lors de la déconnexion`,
+      message: 'Une erreur est survenue lors de la déconnexion',
     });
   }
 };
 
-export const changePassword = async (
-  request: Request,
-  response: Response
-): Promise<any> => {
+export const changePassword = async (request: Request, response: Response): Promise<any> => {
   try {
     const { userId, password, isChangePassword } = request.body as {
       userId: string;
@@ -158,18 +147,15 @@ export const changePassword = async (
       success: true,
       message: 'Votre mot de passe a été bien changer.',
     });
-  } catch (e) {
+  } catch (_e) {
     return response.status(500).json({
       success: false,
-      message: `Une erreur est survenue lors de la modification de mot de passe`,
+      message: 'Une erreur est survenue lors de la modification de mot de passe',
     });
   }
 };
 
-export const getSession = async (
-  request: Request,
-  response: Response
-): Promise<any> => {
+export const getSession = async (request: Request, response: Response): Promise<any> => {
   const id = (request as any).user?.id;
   try {
     const user = await prisma.user.findUnique({
@@ -192,10 +178,10 @@ export const getSession = async (
       success: true,
       data: userWithoutPassword,
     });
-  } catch (error) {
+  } catch (_error) {
     return response.status(500).json({
       success: false,
-      message: `Une erreur est survenue lors de la récupération de la session`,
+      message: 'Une erreur est survenue lors de la récupération de la session',
     });
   }
 };

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { FieldProps } from './interface';
 import {
   FormControl,
   FormDescription,
@@ -9,6 +8,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import AutoFormLabel from './AutoFormLabel.vue';
+import type { FieldProps } from './interface';
 import { beautifyObjectName } from './utils';
 
 defineOptions({

@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { AutoForm } from '@/components/ui/auto-form';
-import z from 'zod';
 import { Button } from '@/components/ui/button';
 import { authStore } from '@/store/auth';
-import { toast } from 'vue-sonner';
-import { useRouter } from 'vue-router';
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { toast } from 'vue-sonner';
+import z from 'zod';
 
 const auth = authStore();
 const router = useRouter();

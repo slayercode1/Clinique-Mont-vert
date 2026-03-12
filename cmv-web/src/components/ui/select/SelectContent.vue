@@ -8,7 +8,7 @@ import {
   SelectViewport,
   useForwardPropsEmits,
 } from 'radix-vue';
-import { computed, type HTMLAttributes } from 'vue';
+import { type HTMLAttributes, computed } from 'vue';
 import { SelectScrollDownButton, SelectScrollUpButton } from '.';
 
 defineOptions({
@@ -19,7 +19,7 @@ const props = withDefaults(
   defineProps<SelectContentProps & { class?: HTMLAttributes['class'] }>(),
   {
     position: 'popper',
-  },
+  }
 );
 const emits = defineEmits<SelectContentEmits>();
 

@@ -3,25 +3,30 @@ import type { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import prisma from '../../utils/prisma.js';
 
-dotenv.config();
+dotenv.config({ quiet: true });
 
 export const jwtErrorHandler = async (
   request: Request,
   response: Response,
   next: NextFunction
 ): Promise<any> => {
-  const authHeader = request.headers['authorization'] as string;
+  const authHeader = request.headers.authorization as string;
 
-  const token = authHeader && authHeader.split(' ')[1];
+  const token = authHeader?.split(' ')[1];
 
   if (!token) return response.sendStatus(401);
 
   // Vérifier le token
-  const user = jwt.verify(token!, String(process.env.JWT_SECRET_KEY)) as {
-    id: string;
-    firstname: string;
-    lastname: string;
-  };
+  let user: { id: string; firstname: string; lastname: string };
+  try {
+    user = jwt.verify(token, String(process.env.JWT_SECRET_KEY)) as {
+      id: string;
+      firstname: string;
+      lastname: string;
+    };
+  } catch {
+    return response.sendStatus(401);
+  }
 
   // Vérifier si le token est stocké dans la base de données
   const storedToken = await prisma.session.findUnique({
@@ -32,6 +37,6 @@ export const jwtErrorHandler = async (
 
   if (storedToken?.token !== token) return response.sendStatus(401);
   // Ajouter l'utilisateur à la requête pour l'utiliser dans les routes suivantes
-  (request as any)['user'] = user;
+  (request as any).user = user;
   next();
 };

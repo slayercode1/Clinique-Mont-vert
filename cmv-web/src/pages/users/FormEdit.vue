@@ -1,15 +1,29 @@
 <script lang="ts" setup>
 import { Button } from '@/components/ui/button';
+import {
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { userStore } from '@/store/user';
+import { updateUserSchema } from '@/utils/schemas/create-user.schema';
 import { toTypedSchema } from '@vee-validate/zod';
 import { useForm } from 'vee-validate';
 import { onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { toast } from 'vue-sonner';
-import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { updateUserSchema } from '@/utils/schemas/create-user.schema';
 
 const user = userStore();
 const router = useRouter();
@@ -31,14 +45,13 @@ onMounted(async () => {
   form.setFieldValue('serviceId', user.user!.serviceId || undefined);
 });
 
-
 const updateUser = (values: any) => {
   isLoading.value = true;
   user
     .updateuser(values, route.params.id as string)
     .then(() => {
       router.replace({ path: '/users-list' });
-      toast.success('L\'utilisateur a bien été modifier.', {
+      toast.success("L'utilisateur a bien été modifier.", {
         position: 'top-right',
       });
       isLoading.value = false;
@@ -66,7 +79,7 @@ const status = [
               @submit.prevent="updateUser">
           <FormField v-slot="{ componentField }" name="email">
             <FormItem>
-              <FormLabel>Addresse e-mail</FormLabel>
+              <FormLabel>Adresse e-mail</FormLabel>
               <FormControl>
                 <Input placeholder="exemple@exemple.com" type="email" v-bind="componentField" />
               </FormControl>
@@ -86,7 +99,7 @@ const status = [
           </FormField>
           <FormField v-slot="{ componentField }" name="firstname">
             <FormItem>
-              <FormLabel>Prenom</FormLabel>
+              <FormLabel>Prénom</FormLabel>
               <FormControl>
                 <Input placeholder="John" type="text" v-bind="componentField" />
               </FormControl>
@@ -100,7 +113,7 @@ const status = [
               <Select v-bind="componentField">
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a service" />
+                    <SelectValue placeholder="Sélectionner un service" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -116,11 +129,11 @@ const status = [
           </FormField>
           <FormField v-slot="{ componentField }" name="roleId">
             <FormItem>
-              <FormLabel>Role</FormLabel>
+              <FormLabel>Rôle</FormLabel>
               <Select v-bind="componentField">
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a role" />
+                    <SelectValue placeholder="Sélectionner un rôle" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -137,11 +150,11 @@ const status = [
           </FormField>
           <FormField v-slot="{ componentField }" name="status">
             <FormItem>
-              <FormLabel>Status</FormLabel>
+              <FormLabel>Statut</FormLabel>
               <Select v-bind="componentField">
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a status" />
+                    <SelectValue placeholder="Sélectionner un statut" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>

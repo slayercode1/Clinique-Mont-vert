@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { FieldProps } from './interface';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
   FormControl,
@@ -11,12 +10,13 @@ import {
 import { Switch } from '@/components/ui/switch';
 import { computed } from 'vue';
 import AutoFormLabel from './AutoFormLabel.vue';
+import type { FieldProps } from './interface';
 import { beautifyObjectName } from './utils';
 
 const props = defineProps<FieldProps>();
 
 const booleanComponent: any = computed(() =>
-  props.config?.component === 'switch' ? Switch : Checkbox,
+  props.config?.component === 'switch' ? Switch : Checkbox
 );
 </script>
 

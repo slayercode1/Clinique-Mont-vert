@@ -1,22 +1,26 @@
 <script lang="ts" setup>
-import { h, onBeforeMount } from 'vue';
 import DataTable from '@/components/DataTable.vue';
-import { ColumnDef } from '@tanstack/vue-table';
-import { useRouter } from 'vue-router';
-import Button from '@/components/ui/button/Button.vue';
-import { ArrowUpDown } from 'lucide-vue-next';
-import { User, userStore } from '@/store/user';
+import DropdownAction from '@/components/data-table-dropdown.vue';
 import Badge from '@/components/ui/badge/Badge.vue';
+import Button from '@/components/ui/button/Button.vue';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import DropdownAction from '@/components/data-table-dropdown.vue';
+import { User, userStore } from '@/store/user';
+import { ColumnDef } from '@tanstack/vue-table';
+import { ArrowUpDown } from 'lucide-vue-next';
+import { h, onBeforeMount, ref } from 'vue';
+import FormAddDialog from './FormAddDialog.vue';
+import FormEditDialog from './FormEditDialog.vue';
 
 const user = userStore();
-const router = useRouter();
+
+const showAddDialog = ref(false);
+const showEditDialog = ref(false);
+const selectedUserId = ref<string | null>(null);
 
 onBeforeMount(async () => {
   await user.fetchUsers();
@@ -24,6 +28,22 @@ onBeforeMount(async () => {
 
 const handleDelete = async (id: string) => {
   await user.deleteUser(id);
+};
+
+const openEditDialog = (id: string) => {
+  selectedUserId.value = id;
+  showEditDialog.value = true;
+};
+
+const closeEditDialog = () => {
+  showEditDialog.value = false;
+  selectedUserId.value = null;
+  user.fetchUsers();
+};
+
+const closeAddDialog = () => {
+  showAddDialog.value = false;
+  user.fetchUsers();
 };
 
 const columns: ColumnDef<User>[] = [
@@ -36,7 +56,7 @@ const columns: ColumnDef<User>[] = [
           variant: 'ghost',
           onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
         },
-        () => ['Nom', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })],
+        () => ['Nom', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]
       );
     },
     cell: ({ row }) => {
@@ -52,7 +72,7 @@ const columns: ColumnDef<User>[] = [
           variant: 'ghost',
           onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
         },
-        () => ['Prénom', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })],
+        () => ['Prénom', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]
       );
     },
     cell: ({ row }) => {
@@ -69,7 +89,7 @@ const columns: ColumnDef<User>[] = [
           variant: 'ghost',
           onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
         },
-        () => ['Addresse e-mail', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })],
+        () => ['Adresse e-mail', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]
       );
     },
     cell: ({ row }) => {
@@ -85,7 +105,7 @@ const columns: ColumnDef<User>[] = [
           variant: 'ghost',
           onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
         },
-        () => ['Service', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })],
+        () => ['Service', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]
       );
     },
     cell: ({ row }) => {
@@ -101,7 +121,7 @@ const columns: ColumnDef<User>[] = [
           variant: 'ghost',
           onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
         },
-        () => ['Status', h(ArrowUpDown, { class: 'ml-2 h-4 w-4 text-center' })],
+        () => ['Statut', h(ArrowUpDown, { class: 'ml-2 h-4 w-4 text-center' })]
       );
     },
     cell: ({ row }) => {
@@ -118,12 +138,10 @@ const columns: ColumnDef<User>[] = [
             DropdownMenuTrigger,
             {
               onClick: (e: MouseEvent) => {
-                e.stopPropagation(); // Empêcher la propagation du clic
+                e.stopPropagation();
               },
             },
-            [
-              badge, // Affiche la valeur actuelle de l'état dans le bouton
-            ],
+            [badge]
           ),
           h(DropdownMenuContent, [
             h(
@@ -135,10 +153,10 @@ const columns: ColumnDef<User>[] = [
                       ...row.original,
                       status: 'ACTIF',
                     },
-                    row.original.id,
+                    row.original.id
                   ),
               },
-              'ACTIF',
+              'ACTIF'
             ),
             h(
               DropdownMenuItem,
@@ -149,13 +167,13 @@ const columns: ColumnDef<User>[] = [
                       ...row.original,
                       status: 'INACTIF',
                     },
-                    row.original.id,
+                    row.original.id
                   ),
               },
-              'INACTIF',
+              'INACTIF'
             ),
           ]),
-        ]),
+        ])
       );
     },
   },
@@ -163,16 +181,17 @@ const columns: ColumnDef<User>[] = [
     id: 'actions',
     enableHiding: false,
     cell: ({ row }) => {
-      const user = row.original as User;
+      const u = row.original as User;
       return h(
         'div',
         { class: 'relative w-4' },
         h(DropdownAction, {
-          data: user,
-          url: `/user-update/${user.id}`,
+          data: u,
+          url_update: true,
           detail: false,
-          handleDelete: () => handleDelete(user.id),
-        }),
+          handleDelete: () => handleDelete(u.id),
+          onViewUpdate: () => openEditDialog(u.id),
+        })
       );
     },
   },
@@ -183,9 +202,9 @@ const columns: ColumnDef<User>[] = [
   <div class="w-full">
     <div class="p-2 w-full md:w-[calc(100%-50px)] mt-8">
       <h1 class="text-2xl font-bold mb-2">Espace Information</h1>
-      <p class="text-xl font-bold mb-4">Liste des comptes d’employé: {{ user.count }}</p>
+      <p class="text-xl font-bold mb-4">Liste des comptes d'employé: {{ user.count }}</p>
       <DataTable
-        :click="() => router.push('/user-add')"
+        :click="() => (showAddDialog = true)"
         :columns="columns"
         :data="user.getUsers"
         btn_text="Ajouter un utilisateur"
@@ -193,4 +212,7 @@ const columns: ColumnDef<User>[] = [
       />
     </div>
   </div>
+
+  <FormAddDialog :open="showAddDialog" @close="closeAddDialog" />
+  <FormEditDialog :open="showEditDialog" :user-id="selectedUserId" @close="closeEditDialog" />
 </template>
