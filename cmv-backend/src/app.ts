@@ -5,6 +5,8 @@ import express from 'express';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import { proxy } from './middlewares/proxy/proxy.js';
+import './it_service/it-service.js';
+import './fleet_service/fleet-service.js';
 
 dotenv.config({ quiet: true });
 
