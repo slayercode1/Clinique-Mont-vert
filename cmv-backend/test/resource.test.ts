@@ -1,8 +1,7 @@
+import { afterAll, beforeAll, describe, expect, it } from '@jest/globals';
 import request from 'supertest';
 import gateway from '../src/app';
-import { describe, expect, beforeAll, it, afterAll } from '@jest/globals';
 import prisma from '../src/utils/prisma';
-
 
 describe('API Endpoints Resources', () => {
   let token: string;
@@ -52,8 +51,7 @@ describe('API Endpoints Resources', () => {
       expect(response.body.success).toBe(true);
       expect(response.body.data).toEqual(response.body.data);
 
-      resourceId = response.body.data.id
-      
+      resourceId = response.body.data.id;
     });
   });
 
@@ -72,7 +70,7 @@ describe('API Endpoints Resources', () => {
     });
 
     it('should return 404 if resource not found', async () => {
-      const id = resourceId + 'crkik';
+      const id = `${resourceId}crkik`;
 
       const response = await request(gateway)
         .patch(`/it/resource/${id}`)
@@ -81,23 +79,18 @@ describe('API Endpoints Resources', () => {
 
       expect(response.status).toBe(404);
       expect(response.body.success).toBe(false);
-      expect(response.body.message).toContain(
-        "La ressource n'a pas etait trouver"
-      );
+      expect(response.body.message).toContain("La ressource n'a pas etait trouver");
     });
   });
 
   afterAll(async () => {
-
     await prisma.material.delete({
       where: {
-        id: resourceId
-      }
-    })
+        id: resourceId,
+      },
+    });
 
     // Déconnexion après le test
-    await request(gateway)
-      .post(`/it/sign-out/${userId}`)
-      .set('Authorization', `Bearer ${token}`);
+    await request(gateway).post(`/it/sign-out/${userId}`).set('Authorization', `Bearer ${token}`);
   });
 });

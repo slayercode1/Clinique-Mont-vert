@@ -1,29 +1,29 @@
 <script lang="ts" setup>
 import DataTable from '@/components/DataTable.vue';
 import DropdownAction from '@/components/data-table-dropdown.vue';
+import Badge from '@/components/ui/badge/Badge.vue';
 import Button from '@/components/ui/button/Button.vue';
 import Card from '@/components/ui/card/Card.vue';
 import CardContent from '@/components/ui/card/CardContent.vue';
 import CardHeader from '@/components/ui/card/CardHeader.vue';
 import CardTitle from '@/components/ui/card/CardTitle.vue';
-import Badge from '@/components/ui/badge/Badge.vue';
 import CostAdd from '@/pages/fleet/CostAdd.vue';
 import { fleetStore } from '@/store/fleet.ts';
 import { CostType, VehicleType } from '@/utils/types';
 import { ColumnDef } from '@tanstack/vue-table';
 import {
+  AlertTriangle,
   ArrowUpDown,
   BrainCircuit,
-  Loader2,
-  AlertTriangle,
+  Car,
   CheckCircle,
   Clock,
   Fuel,
-  Car,
-  Wrench,
   Gauge,
+  Loader2,
+  Wrench,
 } from 'lucide-vue-next';
-import { h, onBeforeMount, computed } from 'vue';
+import { computed, h, onBeforeMount } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 const vehicle = fleetStore();

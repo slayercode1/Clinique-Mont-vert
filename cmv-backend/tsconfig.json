@@ -4,16 +4,10 @@
     "target": "ESNext",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
-    "lib": [
-      "ESNext",
-      "DOM"
-    ],
+    "lib": ["ESNext", "DOM"],
     "outDir": "./dist",
     "rootDir": "./src",
-    "types": [
-      "jest",
-      "node"
-    ],
+    "types": ["jest", "node"],
     // Configuration stricte
     "strict": true,
     "noImplicitAny": false,
@@ -37,15 +31,8 @@
     "isolatedModules": true,
     "incremental": true,
     "allowJs": true,
-    "allowSyntheticDefaultImports": true,
+    "allowSyntheticDefaultImports": true
   },
-  "include": [
-    "src/**/*",
-    "src/utils/prisma.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "**/dist",
-    "**/*.test.ts",
-  ]
+  "include": ["src/**/*", "src/utils/prisma.ts"],
+  "exclude": ["node_modules", "**/dist", "**/*.test.ts"]
 }

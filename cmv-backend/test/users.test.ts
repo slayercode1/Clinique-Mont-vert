@@ -1,6 +1,6 @@
+import { afterAll, beforeAll, describe, expect, it } from '@jest/globals';
 import request from 'supertest';
 import gateway from '../src/app';
-import { describe, expect, beforeAll, it, afterAll } from '@jest/globals';
 import prisma from '../src/utils/prisma';
 
 describe('API Endpoints USER', () => {
@@ -23,14 +23,14 @@ describe('API Endpoints USER', () => {
     service = await prisma.service.create({
       data: {
         name: 'ServiceTest',
-      }
-    })
+      },
+    });
 
     role = await prisma.role.findFirst({
       where: {
-        name: 'SuperAdmin'
-      }
-    })
+        name: 'SuperAdmin',
+      },
+    });
   });
 
   it('GET /users should return list of users', async () => {
@@ -69,10 +69,7 @@ describe('API Endpoints USER', () => {
       .expect('Content-Type', /json/);
 
     expect(response.body).toHaveProperty('success', false);
-    expect(response.body).toHaveProperty(
-      'message',
-      "L'utilisateur n'a pas était trouver"
-    );
+    expect(response.body).toHaveProperty('message', "L'utilisateur n'a pas était trouver");
   });
 
   it('GET /roles should return a list of roles', async () => {
@@ -103,14 +100,11 @@ describe('API Endpoints USER', () => {
       .expect(200)
       .expect('Content-Type', /json/);
 
-
     expect(response.body).toHaveProperty('success', true);
     expect(response.body).toEqual({
       success: true,
       data: response.body.data,
     });
-
-
   });
 
   it('POST /role should create a new role', async () => {
@@ -128,9 +122,9 @@ describe('API Endpoints USER', () => {
 
     await prisma.role.delete({
       where: {
-        id: response.body.data.id
-      }
-    })
+        id: response.body.data.id,
+      },
+    });
   });
 
   it('POST /service should create a new service', async () => {
@@ -148,9 +142,9 @@ describe('API Endpoints USER', () => {
 
     await prisma.service.delete({
       where: {
-        id: response.body.data.id
-      }
-    })
+        id: response.body.data.id,
+      },
+    });
   });
 
   it('POST /permission should create or update a permission', async () => {
@@ -159,7 +153,7 @@ describe('API Endpoints USER', () => {
       .set('Authorization', `Bearer ${token}`)
       .send({
         roleId: role.id,
-        permissions: [{ resource: "test", actions: ['create'] }]
+        permissions: [{ resource: 'test', actions: ['create'] }],
       })
       .expect(200)
       .expect('Content-Type', /json/);
@@ -175,17 +169,16 @@ describe('API Endpoints USER', () => {
       .set('Authorization', `Bearer ${token}`)
       .send({
         roleId: role.id,
-        permissions: [{ resource: "test", actions: [] }]
+        permissions: [{ resource: 'test', actions: [] }],
       })
-      .expect(200)
-    
-    await prisma.permission.deleteMany  ({
+      .expect(200);
+
+    await prisma.permission.deleteMany({
       where: {
         action: 'create',
-        resource: 'test'
-      }
-    })
-
+        resource: 'test',
+      },
+    });
   });
 
   it('PATCH /user/:id should update an user', async () => {
@@ -230,25 +223,22 @@ describe('API Endpoints USER', () => {
   });
 
   afterAll(async () => {
-
     //delete all data on database
     await prisma.user.deleteMany({
       where: {
         id: {
-          not: userId
-        }
-      }
-    })
+          not: userId,
+        },
+      },
+    });
 
     await prisma.service.delete({
       where: {
-        id: service.id
-      }
-    })
+        id: service.id,
+      },
+    });
 
     // Déconnexion après le test
-    await request(gateway)
-      .post(`/it/sign-out/${userId}`)
-      .set('Authorization', `Bearer ${token}`);
+    await request(gateway).post(`/it/sign-out/${userId}`).set('Authorization', `Bearer ${token}`);
   });
 });

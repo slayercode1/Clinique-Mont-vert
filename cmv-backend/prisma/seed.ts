@@ -733,12 +733,6 @@ async function main() {
       await prisma.cost.create({ data: c });
     }
   }
-
-  console.log('Seed de démo terminé avec succès !');
-  console.log('---');
-  console.log(`Compte admin : admin@cmv.re / ${defaultPassword}`);
-  console.log(`Compte IT admin : marie.riviere@cmv.re / ${defaultPassword}`);
-  console.log(`Tous les mots de passe : ${defaultPassword}`);
 }
 
 main()

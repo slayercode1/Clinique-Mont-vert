@@ -1,6 +1,6 @@
+import { afterAll, beforeAll, describe, expect, it } from '@jest/globals';
 import request from 'supertest';
 import gateway from '../src/app';
-import { afterAll, beforeAll, describe, expect, it } from '@jest/globals';
 import prisma from '../src/utils/prisma';
 
 describe('API Endpoints Fleet', () => {
@@ -144,8 +144,6 @@ describe('API Endpoints Fleet', () => {
     });
 
     // Déconnexion après les tests
-    await request(gateway)
-      .post(`/it/sign-out/${userId}`)
-      .set('Authorization', `Bearer ${token}`);
+    await request(gateway).post(`/it/sign-out/${userId}`).set('Authorization', `Bearer ${token}`);
   });
 });

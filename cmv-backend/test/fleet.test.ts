@@ -1,6 +1,6 @@
+import { afterAll, beforeAll, describe, expect, it } from '@jest/globals';
 import request from 'supertest';
 import gateway from '../src/app';
-import { describe, expect, beforeAll, it, afterAll } from '@jest/globals';
 import prisma from '../src/utils/prisma';
 
 describe('API Endpoints Fleet', () => {
@@ -74,9 +74,9 @@ describe('API Endpoints Fleet', () => {
 
       await prisma.cost.delete({
         where: {
-          id: response.body.data.id
-        }
-      })
+          id: response.body.data.id,
+        },
+      });
     });
   });
 
@@ -98,9 +98,7 @@ describe('API Endpoints Fleet', () => {
 
       expect(response.status).toBe(404);
       expect(response.body.success).toBe(false);
-      expect(response.body.message).toContain(
-        "Le véhicule n'a pas était trouver"
-      );
+      expect(response.body.message).toContain("Le véhicule n'a pas était trouver");
     });
   });
 
@@ -125,22 +123,17 @@ describe('API Endpoints Fleet', () => {
 
       expect(response.status).toBe(404);
       expect(response.body.success).toBe(false);
-      expect(response.body.message).toContain(
-        "Le véhicule n'a pas était trouver"
-      );
+      expect(response.body.message).toContain("Le véhicule n'a pas était trouver");
     });
   });
 
   afterAll(async () => {
-
     await prisma.vehicle.delete({
       where: {
-        id: vehicleId
-      }
-    })
+        id: vehicleId,
+      },
+    });
     // Déconnexion après les tests
-    await request(gateway)
-      .post(`/it/sign-out/${userId}`)
-      .set('Authorization', `Bearer ${token}`);
+    await request(gateway).post(`/it/sign-out/${userId}`).set('Authorization', `Bearer ${token}`);
   });
 });

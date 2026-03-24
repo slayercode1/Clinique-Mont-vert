@@ -9,10 +9,10 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
-import { Toaster } from 'vue-sonner';
 import { Settings } from 'lucide-vue-next';
 import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { Toaster } from 'vue-sonner';
 import Splashscreen from './components/Splashscreen.vue';
 import { authStore } from './store/auth';
 import { useTokenStore } from './store/token';
