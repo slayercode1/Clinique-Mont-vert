@@ -39,7 +39,8 @@
     "ioredis": "^5.10.0",
     "jsonwebtoken": "^9.0.3",
     "nodemailer": "^8.0.2",
-    "pg": "^8.20.0"
+    "pg": "^8.20.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
@@ -66,8 +67,7 @@
     "ts-jest": "^29.4.6",
     "ts-node": "^10.9.2",
     "tsx": "^4.21.0",
-    "typescript": "^5.9.3",
-    "zod": "^4.3.6"
+    "typescript": "^5.9.3"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

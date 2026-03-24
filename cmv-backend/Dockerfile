@@ -31,4 +31,4 @@ COPY views ./views
 
 EXPOSE 3000
 
-CMD ["node", "dist/app.js"]
+CMD ["sh", "-c", "node dist/it_service/it-service.js & node dist/fleet_service/fleet-service.js & node dist/app.js"]
