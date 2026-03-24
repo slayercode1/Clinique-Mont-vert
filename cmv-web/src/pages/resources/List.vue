@@ -1,29 +1,54 @@
 <script lang="ts" setup>
-import { h, onBeforeMount } from 'vue';
 import DataTable from '@/components/DataTable.vue';
-import { ColumnDef } from '@tanstack/vue-table';
-import { useRouter } from 'vue-router';
-import Button from '@/components/ui/button/Button.vue';
-import { ArrowUpDown } from 'lucide-vue-next';
-import { Resource, resourceStore } from '@/store/resource';
-import { Card } from '@/components/ui/card';
+import DropdownAction from '@/components/data-table-dropdown.vue';
 import Badge from '@/components/ui/badge/Badge.vue';
+import Button from '@/components/ui/button/Button.vue';
+import { Card } from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import DropdownAction from '@/components/data-table-dropdown.vue';
+import { Resource, resourceStore } from '@/store/resource';
+import { ColumnDef } from '@tanstack/vue-table';
+import { ArrowUpDown } from 'lucide-vue-next';
+import { h, onBeforeMount, ref } from 'vue';
+import FormAddDialog from './FormAddDialog.vue';
+import FormEditDialog from './FormEditDialog.vue';
 
 const resource = resourceStore();
-const router = useRouter();
+
+const dateFormatter = new Intl.DateTimeFormat('fr-FR', {
+  year: 'numeric',
+  month: 'long',
+  day: '2-digit',
+});
+
+const showAddDialog = ref(false);
+const showEditDialog = ref(false);
+const selectedResourceId = ref<string | null>(null);
 
 onBeforeMount(async () => {
   await resource.fetchResources();
 });
+
 const handleDelete = async (id: string) => {
   await resource.deleteResource(id);
+};
+
+const openEditDialog = (id: string) => {
+  selectedResourceId.value = id;
+  showEditDialog.value = true;
+};
+
+const closeEditDialog = () => {
+  showEditDialog.value = false;
+  selectedResourceId.value = null;
+};
+
+const closeAddDialog = () => {
+  showAddDialog.value = false;
 };
 
 const columns: ColumnDef<Resource>[] = [
@@ -36,7 +61,7 @@ const columns: ColumnDef<Resource>[] = [
           variant: 'ghost',
           onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
         },
-        () => ['Type', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })],
+        () => ['Type', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]
       );
     },
     cell: ({ row }) => {
@@ -52,7 +77,7 @@ const columns: ColumnDef<Resource>[] = [
           variant: 'ghost',
           onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
         },
-        () => ['Ressource', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })],
+        () => ['Ressource', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]
       );
     },
     cell: ({ row }) => {
@@ -68,7 +93,7 @@ const columns: ColumnDef<Resource>[] = [
           variant: 'ghost',
           onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
         },
-        () => ['Enplacement', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })],
+        () => ['Localisation', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]
       );
     },
     cell: ({ row }) => {
@@ -84,7 +109,7 @@ const columns: ColumnDef<Resource>[] = [
           variant: 'ghost',
           onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
         },
-        () => ['Etat', h(ArrowUpDown, { class: 'ml-2 h-4 w-4 text-center' })],
+        () => ['Etat', h(ArrowUpDown, { class: 'ml-2 h-4 w-4 text-center' })]
       );
     },
     cell: ({ row }) => {
@@ -100,7 +125,7 @@ const columns: ColumnDef<Resource>[] = [
         {
           class: `font-medium ${(stateStyles as any)[state] || 'bg-gray-200 text-black'}`,
         },
-        state.replace('_', ' '), // Affiche l'état de manière lisible (ex. "IN_USE" devient "In Use")
+        state.replace('_', ' ')
       );
 
       return h(
@@ -111,12 +136,10 @@ const columns: ColumnDef<Resource>[] = [
             DropdownMenuTrigger,
             {
               onClick: (e: MouseEvent) => {
-                e.stopPropagation(); // Empêcher la propagation du clic
+                e.stopPropagation();
               },
             },
-            [
-              badge, // Affiche la valeur actuelle de l'état dans le bouton
-            ],
+            [badge]
           ),
           h(DropdownMenuContent, [
             h(
@@ -124,7 +147,7 @@ const columns: ColumnDef<Resource>[] = [
               {
                 onClick: () => resource.updateResource({ state: 'IN_USE' }, row.original?.id!),
               },
-              'In Use',
+              'En service'
             ),
             h(
               DropdownMenuItem,
@@ -132,17 +155,17 @@ const columns: ColumnDef<Resource>[] = [
                 onClick: () =>
                   resource.updateResource({ state: 'OUT_OF_SERVICE' }, row.original?.id!),
               },
-              'Out of Service',
+              'Hors service'
             ),
             h(
               DropdownMenuItem,
               {
                 onClick: () => resource.updateResource({ state: 'IN_REPAIR' }, row.original?.id!),
               },
-              'In Repair',
+              'En réparation'
             ),
           ]),
-        ]),
+        ])
       );
     },
   },
@@ -155,18 +178,14 @@ const columns: ColumnDef<Resource>[] = [
           variant: 'ghost',
           onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
         },
-        () => ['Date d’achat', h(ArrowUpDown, { class: 'ml-2 h-4 w-4 text-center' })],
+        () => ["Date d'achat", h(ArrowUpDown, { class: 'ml-2 h-4 w-4 text-center' })]
       );
     },
     cell: ({ row }) => {
       return h(
         'div',
         { class: 'font-medium' },
-        new Intl.DateTimeFormat('fr-FR', {
-          year: 'numeric',
-          month: 'long',
-          day: '2-digit',
-        }).format(new Date(row.getValue('purchase_date'))),
+        dateFormatter.format(new Date(row.getValue('purchase_date')))
       );
     },
   },
@@ -179,7 +198,7 @@ const columns: ColumnDef<Resource>[] = [
           variant: 'ghost',
           onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
         },
-        () => ['Fournisseur', h(ArrowUpDown, { class: 'ml-2 h-4 w-4 text-center' })],
+        () => ['Fournisseur', h(ArrowUpDown, { class: 'ml-2 h-4 w-4 text-center' })]
       );
     },
     cell: ({ row }) => {
@@ -195,18 +214,14 @@ const columns: ColumnDef<Resource>[] = [
           variant: 'ghost',
           onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
         },
-        () => ['Expiration Licence', h(ArrowUpDown, { class: 'ml-2 h-4 w-4 text-center' })],
+        () => ['Expiration Licence', h(ArrowUpDown, { class: 'ml-2 h-4 w-4 text-center' })]
       );
     },
     cell: ({ row }) => {
       return h(
         'div',
         { class: 'font-medium' },
-        new Intl.DateTimeFormat('fr-FR', {
-          year: 'numeric',
-          month: 'long',
-          day: '2-digit',
-        }).format(new Date(row.getValue('expired_at'))),
+        dateFormatter.format(new Date(row.getValue('expired_at')))
       );
     },
   },
@@ -214,16 +229,17 @@ const columns: ColumnDef<Resource>[] = [
     id: 'actions',
     enableHiding: false,
     cell: ({ row }) => {
-      const resource = row.original as Resource;
+      const r = row.original as Resource;
       return h(
         'div',
         { class: 'relative' },
         h(DropdownAction, {
-          data: resource,
-          url: `resource-update/${resource.id}`,
+          data: r,
+          url_update: true,
           detail: false,
-          handleDelete: () => handleDelete(resource.id as string),
-        }),
+          handleDelete: () => handleDelete(r.id as string),
+          onViewUpdate: () => openEditDialog(r.id as string),
+        })
       );
     },
   },
@@ -260,7 +276,7 @@ const columns: ColumnDef<Resource>[] = [
         </div>
       </div>
       <DataTable
-        :click="() => router.push('/resource-add')"
+        :click="() => (showAddDialog = true)"
         :columns="columns"
         :data="resource.getResources"
         btn_text="Ajouter une ressource"
@@ -268,4 +284,7 @@ const columns: ColumnDef<Resource>[] = [
       />
     </div>
   </div>
+
+  <FormAddDialog :open="showAddDialog" @close="closeAddDialog" />
+  <FormEditDialog :open="showEditDialog" :resource-id="selectedResourceId" @close="closeEditDialog" />
 </template>

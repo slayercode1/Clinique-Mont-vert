@@ -1,18 +1,18 @@
-import type { Config } from '@jest/types';
-
-const config: Config.InitialOptions = {
-  verbose: true,
+export default {
   preset: 'ts-jest/presets/default-esm',
-  testEnvironment: 'node',
-  transform: {
-    '^.+\\.(ts|tsx)$': 'ts-jest',
-    '^.+\\.mjs$': 'babel-jest',
-  },
-  maxWorkers: 1,
-  moduleFileExtensions: ['js', 'ts'],
   extensionsToTreatAsEsm: ['.ts'],
+  testEnvironment: 'node',
+  injectGlobals: true,
   moduleNameMapper: {
-    '^(\\.{1,2}/.*)\\.js$': '$1', // Corrige les imports avec extension .js
+    '^(\\.{1,2}/.*)\\.js$': '$1',
   },
+  transform: {
+    '^.+\\.tsx?$': [
+      'ts-jest',
+      { useESM: true, tsconfig: { module: 'ESNext', moduleResolution: 'Bundler' } },
+    ],
+  },
+  testMatch: ['**/__tests__/**/*.test.ts'],
+  forceExit: true,
+  clearMocks: true,
 };
-export default config;

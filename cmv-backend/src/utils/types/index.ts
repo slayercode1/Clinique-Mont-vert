@@ -1,11 +1,8 @@
+import type { z } from 'zod';
+import type { createResourceSchema } from '../schemas/create-resource.schema.js';
+import type { createTicketSchema } from '../schemas/create-ticket.schema.js';
 import type { createUserSchema } from '../schemas/create-user.schema.js';
-import { z } from 'zod';
-import { createResourceSchema } from '../schemas/create-resource.schema.js';
-import { createTicketSchema } from '../schemas/create-ticket.schema.js';
-import {
-  createCostSchema,
-  createVehicleSchema,
-} from '../schemas/create-vehicle.schema.js';
+import type { createCostSchema, createVehicleSchema } from '../schemas/create-vehicle.schema.js';
 
 export type UserType = z.infer<typeof createUserSchema>;
 export type ResourceType = z.infer<typeof createResourceSchema>;

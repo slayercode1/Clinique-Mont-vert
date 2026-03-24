@@ -1,8 +1,8 @@
-import type { Ref } from 'vue';
-import type * as z from 'zod';
 import { createContext } from 'radix-vue';
 import { useFieldValue, useFormValues } from 'vee-validate';
+import type { Ref } from 'vue';
 import { computed, ref, watch } from 'vue';
+import type * as z from 'zod';
 import { type Dependency, DependencyType, type EnumValues } from './interface';
 import { getFromPath, getIndexIfArray } from './utils';
 
@@ -24,7 +24,7 @@ export default function useDependencies(fieldName: string) {
   const overrideOptions = ref<EnumValues | undefined>();
 
   const currentFieldDependencies = computed(() =>
-    dependencies.value?.filter((dependency) => dependency.targetField === currentFieldName),
+    dependencies.value?.filter((dependency) => dependency.targetField === currentFieldName)
   );
 
   function getSourceValue(dep: Dependency<any>) {
@@ -42,7 +42,7 @@ export default function useDependencies(fieldName: string) {
   }
 
   const sourceFieldValues = computed(() =>
-    currentFieldDependencies.value?.map((dep) => getSourceValue(dep)),
+    currentFieldDependencies.value?.map((dep) => getSourceValue(dep))
   );
 
   const resetConditionState = () => {
@@ -56,7 +56,7 @@ export default function useDependencies(fieldName: string) {
     [sourceFieldValues, dependencies],
     () => {
       resetConditionState();
-      currentFieldDependencies.value?.forEach((dep) => {
+      for (const dep of currentFieldDependencies.value ?? []) {
         const sourceValue = getSourceValue(dep);
         const conditionMet = dep.when(sourceValue, currentFieldValue.value);
 
@@ -78,9 +78,9 @@ export default function useDependencies(fieldName: string) {
 
             break;
         }
-      });
+      }
     },
-    { immediate: true, deep: true },
+    { immediate: true, deep: true }
   );
 
   return {

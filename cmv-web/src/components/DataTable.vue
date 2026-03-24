@@ -1,5 +1,27 @@
 <script generic="TData extends Record<string, any>, TValue" lang="ts" setup>
-import type { ColumnDef, ColumnFiltersState, SortingState, VisibilityState } from '@tanstack/vue-table';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { valueUpdater } from '@/lib/utils';
+import { authStore } from '@/store/auth.ts';
+import type {
+  ColumnDef,
+  ColumnFiltersState,
+  SortingState,
+  VisibilityState,
+} from '@tanstack/vue-table';
 import {
   FlexRender,
   getCoreRowModel,
@@ -8,19 +30,9 @@ import {
   getSortedRowModel,
   useVueTable,
 } from '@tanstack/vue-table';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight } from 'lucide-vue-next';
-import { Input } from './ui/input';
+import { ChevronLeft, ChevronRight, SearchX } from 'lucide-vue-next';
 import { ref } from 'vue';
-import { valueUpdater } from '@/lib/utils';
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { authStore } from '@/store/auth.ts';
+import { Input } from './ui/input';
 
 const props = defineProps<{
   columns: ColumnDef<TData, TValue>[];
@@ -30,40 +42,34 @@ const props = defineProps<{
   permissionRole: string;
 }>();
 
-// Références réactives pour gérer les filtres, tri, pagination et visibilité des colonnes
-const columnFilters = ref<ColumnFiltersState>([]); // Filtres pour les colonnes
-const globalFilter = ref(''); // Filtre global appliqué sur toute la table
-const sorting = ref<SortingState>([]); // État du tri appliqué sur les colonnes
-const columnVisibility = ref<VisibilityState>({}); // Visibilité des colonnes
+const columnFilters = ref<ColumnFiltersState>([]);
+const globalFilter = ref('');
+const sorting = ref<SortingState>([]);
+const columnVisibility = ref<VisibilityState>({});
 
-// Initialisation de la table avec les différentes fonctionnalités
 const table = useVueTable({
-  // Les données de la table proviennent des props
   get data() {
-    return props.data; // Récupère les données de la table depuis les props
+    return props.data;
   },
-  // Les colonnes de la table proviennent des props
   get columns() {
-    return props.columns; // Récupère les colonnes depuis les props
+    return props.columns;
   },
-  // Utilisation des modèles de ligne pour différentes fonctionnalités
-  getCoreRowModel: getCoreRowModel(), // Récupère le modèle de ligne de base
-  getPaginationRowModel: getPaginationRowModel(), // Récupère le modèle de pagination
-  getSortedRowModel: getSortedRowModel(), // Récupère le modèle de tri
-  onSortingChange: (updaterOrValue) => valueUpdater(updaterOrValue, sorting), // Met à jour l'état du tri lorsqu'il change
-  onGlobalFilterChange: (updaterOrValue) => valueUpdater(updaterOrValue, columnFilters), // Met à jour l'état des filtres globaux lorsqu'ils changent
-  getFilteredRowModel: getFilteredRowModel(), // Récupère le modèle de lignes filtrées
-  onColumnVisibilityChange: (updaterOrValue) => valueUpdater(updaterOrValue, columnVisibility), // Met à jour l'état de la visibilité des colonnes lorsqu'il change
+  getCoreRowModel: getCoreRowModel(),
+  getPaginationRowModel: getPaginationRowModel(),
+  getSortedRowModel: getSortedRowModel(),
+  onSortingChange: (updaterOrValue) => valueUpdater(updaterOrValue, sorting),
+  onGlobalFilterChange: (updaterOrValue) => valueUpdater(updaterOrValue, columnFilters),
+  getFilteredRowModel: getFilteredRowModel(),
+  onColumnVisibilityChange: (updaterOrValue) => valueUpdater(updaterOrValue, columnVisibility),
   state: {
-    // Accès aux états réactifs utilisés pour la table
     get globalFilter() {
-      return globalFilter.value; // Retourne la valeur du filtre global
+      return globalFilter.value;
     },
     get sorting() {
-      return sorting.value; // Retourne l'état du tri
+      return sorting.value;
     },
     get columnVisibility() {
-      return columnVisibility.value; // Retourne l'état de la visibilité des colonnes
+      return columnVisibility.value;
     },
   },
 });
@@ -75,7 +81,7 @@ const auth = authStore();
   <div>
     <div class="flex justify-between items-center my-2">
       <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between lg:w-full">
-        <Button v-if="auth.getUser?.role.name === permissionRole || 'SuperAdmin'" @click="click">{{
+        <Button v-if="auth.getUser?.role.name === permissionRole || auth.getUser?.role.name === 'SuperAdmin'" @click="click">{{
             props.btn_text
           }}
         </Button>
@@ -83,13 +89,13 @@ const auth = authStore();
           <Input
             :model-value="globalFilter ?? ''"
             class="max-w-sm"
-            placeholder="Recheche..."
+            placeholder="Rechercher..."
             @update:modelValue="(value) => (globalFilter = String(value))"
           />
           <DropdownMenu>
             <DropdownMenuTrigger as-child>
               <Button class="ml-auto" variant="outline">
-                Columns
+                Colonnes
                 <ChevronDown class="w-4 h-4 ml-2" />
               </Button>
             </DropdownMenuTrigger>
@@ -138,7 +144,13 @@ const auth = authStore();
         </template>
         <template v-else>
           <TableRow>
-            <TableCell :colspan="columns.length" class="h-24 text-center"> No results.</TableCell>
+            <TableCell :colspan="columns.length" class="h-40 text-center">
+              <div class="flex flex-col items-center justify-center gap-2 text-muted-foreground">
+                <SearchX class="w-10 h-10 opacity-40" />
+                <p class="text-base font-semibold text-gray-700">Aucun résultat</p>
+                <p class="text-sm text-gray-400">Aucune donnée à afficher pour le moment.</p>
+              </div>
+            </TableCell>
           </TableRow>
         </template>
       </TableBody>

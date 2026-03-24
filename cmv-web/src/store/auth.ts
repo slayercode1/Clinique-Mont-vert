@@ -1,6 +1,7 @@
+import { authFetch, authHeaders } from '@/utils/storage';
 import { defineStore } from 'pinia';
-import { User } from './user';
 import { API_ENDPOINT } from './api-endpoint';
+import type { User } from './user';
 
 export const authStore = defineStore('auth', {
   state() {
@@ -12,77 +13,52 @@ export const authStore = defineStore('auth', {
 
   actions: {
     async signin(payload: { email: string; password: string }) {
-      try {
-        const response = await fetch(`${API_ENDPOINT}/it/sign-in`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(payload),
-        });
-
-        const data = await response.json();
-
-        // Si la réponse n'est pas ok (status 400 par exemple)
-        if (!response.ok) {
-          throw new Error(data.message);
-        }
-        return data;
-      } catch (error) {
-        // Propager l'erreur pour la gérer dans handleSubmit
-        throw error;
-      }
-    },
-
-    async session() {
-      try {
-        const response = await fetch(`${API_ENDPOINT}/it/session`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('ssid')}`,
-            'Content-Type': 'application/json', // optional, depending on the API requirements
-          },
-        });
-
-        const data = await response.json();
-
-        // Si la réponse n'est pas ok (status 400 par exemple)
-        if (!response.ok) {
-          throw new Error(data.message);
-        }
-
-        this.user = data.data;
-        return data;
-      } catch (error) {
-        // Propager l'erreur pour la gérer dans handleSubmit
-        throw error;
-      }
-    },
-
-    async signout(id: string) {
-      await fetch(`${API_ENDPOINT}/it/sign-out/${id}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('ssid')}`,
-          'Content-Type': 'application/json', // optional, depending on the API requirements
-        },
+      const response = await fetch(`${API_ENDPOINT}/it/sign-in`, {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
       });
-    },
-    async updateUser(password: Record<string, any>, id: string) {
-      const response = await fetch(`${API_ENDPOINT}/it/change-password`, {
-        method: 'PATCH',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('ssid')}`,
-          'Content-Type': 'application/json', // optional, depending on the API requirements
-        },
-        body: JSON.stringify({
-          password: password.password,
-          userId: id,
-        }),
-      });
-      const { data } = await response.json();
+
+      const data = await response.json();
 
       if (!response.ok) {
         throw new Error(data.message);
+      }
+      return data;
+    },
+
+    async session() {
+      const response = await fetch(`${API_ENDPOINT}/it/session`, {
+        headers: authHeaders(),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message);
+      }
+
+      this.user = data.data;
+      return data;
+    },
+
+    async signout() {
+      await authFetch(`${API_ENDPOINT}/it/sign-out`, {
+        method: 'POST',
+      });
+    },
+
+    async updateUser(password: Record<string, any>) {
+      const response = await authFetch(`${API_ENDPOINT}/it/change-password`, {
+        method: 'PATCH',
+        body: JSON.stringify({
+          password: password.password,
+        }),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || data.data?.message);
       }
 
       return data;

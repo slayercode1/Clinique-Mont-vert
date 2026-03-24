@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { FieldProps } from './interface';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import {
@@ -11,6 +10,7 @@ import {
 } from '@/components/ui/form';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
+import type { FieldProps } from './interface';
 
 import { DateFormatter } from '@internationalized/date';
 import { CalendarIcon } from '@radix-icons/vue';

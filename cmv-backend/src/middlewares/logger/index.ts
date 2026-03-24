@@ -1,30 +1,16 @@
-import chalk from "chalk";
-import { NextFunction, Request, Response } from "express";
+import type { NextFunction, Request, Response } from 'express';
 
 export const logger = (req: Request, res: Response, next: NextFunction) => {
-  const start = Date.now(); // capture le début de la requête
+  const start = Date.now();
 
-  // Couleurs pour les méthodes HTTP
-  let methodColor = chalk.blue;
-  if (req.method === "GET") {
-    methodColor = chalk.green;
-  } else if (req.method === "POST") {
-    methodColor = chalk.cyan;
-  } else if (req.method === "PUT") {
-    methodColor = chalk.yellow;
-  } else if (req.method === "DELETE") {
-    methodColor = chalk.red;
-  }
+  res.on('finish', () => {
+    const duration = Date.now() - start;
+    const log = `${req.method} ${req.originalUrl} ${res.statusCode} ${duration}ms`;
 
-  // Affichage des logs avec couleurs
-
-  // écoute la fin de la réponse pour calculer le temps d'exécution
-  res.on("finish", () => {
-    const duration = Date.now() - start; // temps écoulé
-    console.log(
-      `${methodColor(req.method)} ${chalk.blue(req.originalUrl)} ${chalk.grey(`${duration}ms`)}`,
-    );
+    if (res.statusCode >= 400) {
+      console.warn(log);
+    }
   });
 
   next();
-}
+};

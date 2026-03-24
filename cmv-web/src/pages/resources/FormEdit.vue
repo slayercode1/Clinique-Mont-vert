@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import { AutoForm } from '@/components/ui/auto-form';
 import { Button } from '@/components/ui/button';
+import { Resource, resourceStore } from '@/store/resource';
+import { resourceSchema } from '@/utils/schemas/create-resource.schema.ts';
+import { toTypedSchema } from '@vee-validate/zod';
+import { useForm } from 'vee-validate';
+import { onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { toast } from 'vue-sonner';
-import { Resource, resourceStore } from '@/store/resource';
-import { useForm } from 'vee-validate';
-import { toTypedSchema } from '@vee-validate/zod';
-import { onMounted, ref } from 'vue';
-import { resourceSchema } from '@/utils/schemas/create-resource.schema.ts';
 
 const router = useRouter();
 const resource = resourceStore();
@@ -16,7 +16,6 @@ const route = useRoute();
 
 const updateForm = useForm({
   validationSchema: toTypedSchema(resourceSchema),
-
 });
 
 onMounted(async () => {
@@ -29,7 +28,6 @@ onMounted(async () => {
   updateForm.setFieldValue('supplier', resource.getResource?.supplier || '');
   updateForm.setFieldValue('resource', resource.getResource?.resource || '');
 });
-
 
 const updateResource = (values: Resource) => {
   isloading.value = true;

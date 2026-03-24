@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { cn } from '@/lib/utils';
-import { computed, type HTMLAttributes } from 'vue';
+import { type HTMLAttributes, computed } from 'vue';
 import TableCell from './TableCell.vue';
 import TableRow from './TableRow.vue';
 
@@ -11,7 +11,7 @@ const props = withDefaults(
   }>(),
   {
     colspan: 1,
-  },
+  }
 );
 
 const delegatedProps = computed(() => {

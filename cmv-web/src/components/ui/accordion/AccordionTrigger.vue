@@ -2,7 +2,7 @@
 import { cn } from '@/lib/utils';
 import { ChevronDownIcon } from '@radix-icons/vue';
 import { AccordionHeader, AccordionTrigger, type AccordionTriggerProps } from 'radix-vue';
-import { computed, type HTMLAttributes } from 'vue';
+import { type HTMLAttributes, computed } from 'vue';
 
 const props = defineProps<AccordionTriggerProps & { class?: HTMLAttributes['class'] }>();
 

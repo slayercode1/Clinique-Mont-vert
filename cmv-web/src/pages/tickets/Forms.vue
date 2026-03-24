@@ -1,8 +1,6 @@
 <script lang="ts" setup>
+import Combobox from '@/components/Combobox.vue';
 import { Button } from '@/components/ui/button';
-import { useRouter } from 'vue-router';
-import { toast } from 'vue-sonner';
-import { ticketStore } from '@/store/ticket';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import {
   Select,
@@ -12,15 +10,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useForm } from 'vee-validate';
-import { toTypedSchema } from '@vee-validate/zod';
 import { Textarea } from '@/components/ui/textarea';
-import { onBeforeMount, ref } from 'vue';
-import { resourceStore } from '@/store/resource.ts';
-import Combobox from '@/components/Combobox.vue';
-import { userStore } from '@/store/user.ts';
 import { authStore } from '@/store/auth.ts';
+import { resourceStore } from '@/store/resource.ts';
+import { ticketStore } from '@/store/ticket';
+import { userStore } from '@/store/user.ts';
 import { createTicketSchema } from '@/utils/schemas/create-ticket.schema.ts';
+import { toTypedSchema } from '@vee-validate/zod';
+import { useForm } from 'vee-validate';
+import { onBeforeMount, ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { toast } from 'vue-sonner';
 
 const router = useRouter();
 const ticket = ticketStore();
@@ -102,7 +102,7 @@ const priorities = [
             name="assignId"
           >
             <FormItem>
-              <FormLabel>Utilisateur assigner</FormLabel>
+              <FormLabel>Utilisateur assigné</FormLabel>
 
               <Combobox
                 :data="
@@ -125,7 +125,7 @@ const priorities = [
               <FormControl>
                 <Select v-bind="componentField">
                   <SelectTrigger class="w-full">
-                    <SelectValue placeholder="Choissisez un service" />
+                    <SelectValue placeholder="Choisissez un service" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
@@ -149,7 +149,7 @@ const priorities = [
               <FormControl>
                 <Select v-bind="componentField">
                   <SelectTrigger class="w-full">
-                    <SelectValue placeholder="Choissisez une prioriter" />
+                    <SelectValue placeholder="Choisissez une priorité" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
@@ -169,7 +169,7 @@ const priorities = [
           </FormField>
           <FormField name="materialId">
             <FormItem>
-              <FormLabel>Materiel</FormLabel>
+              <FormLabel>Matériel</FormLabel>
               <Combobox
                 :data="
                   resource.getResources.map((r) => {
@@ -191,7 +191,7 @@ const priorities = [
               <FormControl>
                 <Textarea
                   class="resize-none"
-                  placeholder="Tell us a little bit about yourself"
+                  placeholder="Décrivez le problème rencontré"
                   v-bind="componentField"
                 />
               </FormControl>

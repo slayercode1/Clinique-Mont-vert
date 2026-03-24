@@ -1,27 +1,30 @@
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import prisma from '../../utils/prisma.js';
 
-// Middleware RBAC (Contrôle d'accès basé sur les rôles)
 export const RBAC = (action: string, resource: string): RequestHandler => {
-  return async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  return async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const user = (request as any).user;
-      const userRoleId = user ? user.role.id : 'anonymous';
+      const currentUser = (request as any).user;
+      if (!currentUser?.id) {
+        response.status(401).json({ success: false, message: 'Non autorisé' });
+        return;
+      }
 
-      const userPermissions = await prisma.permissionOnRole.findMany({
-        where: {
-          roleId: userRoleId,
-        },
-        include: {
-          permission: true,
-        },
+      const user = await prisma.user.findUnique({
+        where: { id: currentUser.id },
+        select: { roleId: true },
       });
 
-      // Vérifier si l'utilisateur a la permission spécifique
+      if (!user) {
+        response.status(401).json({ success: false, message: 'Utilisateur introuvable' });
+        return;
+      }
+
+      const userPermissions = await prisma.permissionOnRole.findMany({
+        where: { roleId: user.roleId },
+        include: { permission: true },
+      });
+
       const hasPermission = userPermissions.some(
         (rolePermission: any) =>
           rolePermission.permission.action === action &&
@@ -30,9 +33,8 @@ export const RBAC = (action: string, resource: string): RequestHandler => {
 
       if (hasPermission) {
         return next();
-      } else {
-        response.status(403).json({ success: false, message: 'Access denied' });
       }
+      response.status(403).json({ success: false, message: 'Accès refusé' });
     } catch (error) {
       next(error);
     }

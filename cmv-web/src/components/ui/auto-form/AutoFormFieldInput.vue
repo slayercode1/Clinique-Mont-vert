@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import type { FieldProps } from './interface';
+import { computed } from 'vue';
 import { FormControl, FormDescription, FormField, FormItem, FormMessage } from '../form';
 import { Input } from '../input';
 import { Textarea } from '../textarea';
-import { computed } from 'vue';
 import AutoFormLabel from './AutoFormLabel.vue';
+import type { FieldProps } from './interface';
 import { beautifyObjectName } from './utils';
 
 const props = defineProps<FieldProps>();
 const inputComponent: any = computed(() =>
-  props.config?.component === 'textarea' ? Textarea : Input,
+  props.config?.component === 'textarea' ? Textarea : Input
 );
 </script>
 

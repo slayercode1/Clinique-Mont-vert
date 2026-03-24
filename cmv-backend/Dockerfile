@@ -1,27 +1,32 @@
-ARG NODE_VERSION=22.11.0
+ARG NODE_VERSION=22-alpine
 
-FROM node:${NODE_VERSION}-alpine
+# ── Build stage ────────────────────────────────────────────────────────────────
+FROM node:${NODE_VERSION} AS builder
 
-# Set working directory
-WORKDIR /usr/src/app/cmv-backend
+WORKDIR /app
 
-# Copy package files
-COPY ./package*.json ./
+COPY package*.json ./
+RUN npm ci
 
-# Install dependencies including dev dependencies
-RUN npm install
+COPY . .
+RUN npm run build && npx prisma generate
 
-# Copy the dist folder to the working directory
-COPY ./dist ./dist
+# ── Production stage ───────────────────────────────────────────────────────────
+FROM node:${NODE_VERSION} AS production
 
-COPY ./prisma ./prisma
+WORKDIR /app
 
-COPY ./views ./views
+ENV NODE_ENV=production
 
-RUN npx prisma generate
+COPY package*.json ./
+RUN npm ci --omit=dev && npm cache clean --force
 
-# Expose the port that the application listens on
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+COPY prisma ./prisma
+COPY views ./views
+
 EXPOSE 3000
 
-# Run the application
-CMD npm start
+CMD ["node", "dist/app.js"]

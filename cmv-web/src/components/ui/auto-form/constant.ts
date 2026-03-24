@@ -1,3 +1,4 @@
+import AutoFormFieldPassword from '@/components/ui/auto-form/AutoFormFieldPassword.vue';
 import AutoFormFieldArray from './AutoFormFieldArray.vue';
 import AutoFormFieldBoolean from './AutoFormFieldBoolean.vue';
 import AutoFormFieldDate from './AutoFormFieldDate.vue';
@@ -6,7 +7,6 @@ import AutoFormFieldFile from './AutoFormFieldFile.vue';
 import AutoFormFieldInput from './AutoFormFieldInput.vue';
 import AutoFormFieldNumber from './AutoFormFieldNumber.vue';
 import AutoFormFieldObject from './AutoFormFieldObject.vue';
-import AutoFormFieldPassword from '@/components/ui/auto-form/AutoFormFieldPassword.vue';
 
 export const INPUT_COMPONENTS = {
   date: AutoFormFieldDate,
@@ -30,6 +30,7 @@ export const INPUT_COMPONENTS = {
 export const DEFAULT_ZOD_HANDLERS: {
   [key: string]: keyof typeof INPUT_COMPONENTS;
 } = {
+  // Zod v3
   ZodString: 'string',
   ZodBoolean: 'checkbox',
   ZodDate: 'date',
@@ -38,4 +39,12 @@ export const DEFAULT_ZOD_HANDLERS: {
   ZodNumber: 'number',
   ZodArray: 'array',
   ZodObject: 'object',
+  // Zod v4 (lowercase _def.type)
+  string: 'string',
+  boolean: 'checkbox',
+  date: 'date',
+  enum: 'select',
+  number: 'number',
+  array: 'array',
+  object: 'object',
 };

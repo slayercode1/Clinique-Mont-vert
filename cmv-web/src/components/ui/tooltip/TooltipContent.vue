@@ -7,7 +7,7 @@ import {
   TooltipPortal,
   useForwardPropsEmits,
 } from 'radix-vue';
-import { computed, type HTMLAttributes } from 'vue';
+import { type HTMLAttributes, computed } from 'vue';
 
 defineOptions({
   inheritAttrs: false,
@@ -17,7 +17,7 @@ const props = withDefaults(
   defineProps<TooltipContentProps & { class?: HTMLAttributes['class'] }>(),
   {
     sideOffset: 4,
-  },
+  }
 );
 
 const emits = defineEmits<TooltipContentEmits>();

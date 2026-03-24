@@ -1,47 +1,54 @@
 services:
   db:
-    image: postgres
+    image: postgres:17-alpine
     env_file:
       - ./cmv-backend/.env
     volumes:
       - postgres-data:/var/lib/postgresql/data
-    ports:
-      - '5432:5432'
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-net
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --save 60 1 --loglevel warning
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-net
+    restart: unless-stopped
 
   server:
+    image: ghcr.io/slayercode1/clinique-mont-vert/backend:latest
     build:
       context: ./cmv-backend
     env_file:
       - ./cmv-backend/.env
-    stdin_open: true  # Équivalent de -it pour garder le terminal interactif
-    tty: true         # Équivalent de -it pour garder un pseudo-terminal
     depends_on:
-      - db
-
-  caddy:
-    build:
-      context: ./conf
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - app-net
+      - caddy-net
     restart: unless-stopped
-    cap_add:
-      - NET_ADMIN
-    ports:
-      - "80:80"
-      - "8000:8000"
-      - "443:443"
-    volumes:
-      - $PWD/conf:/etc/caddy
-      - $PWD/cmv-web/dist:/srv
-      - caddy_data:/data
-      - caddy_config:/config
-    depends_on:
-      - db
-      - server
+
+networks:
+  app-net:
+  caddy-net:
+    external: true
 
 volumes:
-  caddy_data:
-  caddy_config:
   postgres-data:
-
-
-
-# docker exec -it cmv-backend_server_1 sh
+  redis-data:

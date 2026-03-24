@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { type Component, computed } from 'vue';
+import Tooltip from '../tooltip/Tooltip.vue';
+import TooltipContent from '../tooltip/TooltipContent.vue';
+import TooltipTrigger from '../tooltip/TooltipTrigger.vue';
 import SidebarMenuButtonChild, { type SidebarMenuButtonProps } from './SidebarMenuButtonChild.vue';
 import { useSidebar } from './utils';
-import Tooltip from '../tooltip/Tooltip.vue';
-import TooltipTrigger from '../tooltip/TooltipTrigger.vue';
-import TooltipContent from '../tooltip/TooltipContent.vue';
 
 defineOptions({
   inheritAttrs: false,
@@ -20,7 +20,7 @@ const props = withDefaults(
     as: 'button',
     variant: 'default',
     size: 'default',
-  },
+  }
 );
 
 const { isMobile, state } = useSidebar();

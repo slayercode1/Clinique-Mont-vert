@@ -1,0 +1,90 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [dev, main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx biome check .
+
+  test-backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: test_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: cmv-backend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: cmv-backend
+        run: npm ci
+
+      - name: Create schemas and run migrations
+        working-directory: cmv-backend
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/test_db
+        run: |
+          PGPASSWORD=test psql -h localhost -U test -d test_db -c 'CREATE SCHEMA IF NOT EXISTS "cmv-it"; CREATE SCHEMA IF NOT EXISTS "cmv-fleet";'
+          npx prisma migrate deploy
+
+      - name: Run tests
+        working-directory: cmv-backend
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/test_db
+          REDIS_URL: redis://localhost:6379
+          JWT_SECRET_KEY: test_secret
+          NODE_ENV: test
+        run: npm test
+
+  test-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: cmv-web/package.json
+
+      - name: Install dependencies
+        working-directory: cmv-web
+        run: npm install
+
+      - name: Run tests
+        working-directory: cmv-web
+        run: npm test

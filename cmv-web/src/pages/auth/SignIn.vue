@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 import { AutoForm } from '@/components/ui/auto-form';
 import { Button } from '@/components/ui/button';
-import { useRouter } from 'vue-router';
 import { authStore } from '@/store/auth';
-import { toast } from 'vue-sonner';
 import { useTokenStore } from '@/store/token.ts';
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { toast } from 'vue-sonner';
 import { z } from 'zod';
 
 const auth = authStore();
@@ -48,10 +48,10 @@ const handleSubmit = (value: { email: string; password: string }) => {
 
       <AutoForm :field-config="{
         email: {
-          label: 'Addresse e-mail',
+          label: 'Adresse e-mail',
           inputProps: {
             type: 'email',
-            placeholder: 'e.g: exxemple@exemple.com',
+            placeholder: 'exemple@exemple.com',
           },
         },
         password: {

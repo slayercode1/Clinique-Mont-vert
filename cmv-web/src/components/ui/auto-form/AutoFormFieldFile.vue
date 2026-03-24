@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { FieldProps } from './interface';
 import { Button } from '@/components/ui/button';
 import {
   FormControl,
@@ -12,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { TrashIcon } from '@radix-icons/vue';
 import { ref } from 'vue';
 import AutoFormLabel from './AutoFormLabel.vue';
+import type { FieldProps } from './interface';
 import { beautifyObjectName } from './utils';
 
 defineProps<FieldProps>();

@@ -1,48 +1,45 @@
 <script setup lang="ts">
 import { AutoForm } from '@/components/ui/auto-form';
-import z from 'zod';
 import { Button } from '@/components/ui/button';
 import { authStore } from '@/store/auth';
-import { toast } from 'vue-sonner';
-import { useRouter } from 'vue-router';
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { toast } from 'vue-sonner';
+import z from 'zod';
 
 const auth = authStore();
 const router = useRouter();
 const isLoading = ref<boolean>(false);
 
 const formChangePasswordSchema = z.object({
-  password: z.string(),
+  password: z.string().min(8, 'Le mot de passe doit contenir au moins 8 caractères').max(128),
 });
+
+const redirectByRole = () => {
+  const roleName = auth.getUser?.role.name || '';
+  if (roleName.startsWith('IT') || roleName === 'SuperAdmin') return '/users-list';
+  if (roleName.startsWith('FLEET')) return '/fleets-list';
+  return '/';
+};
 
 const handleSubmit = (value: Record<string, string>) => {
   isLoading.value = true;
   auth
-    .updateUser({ ...value, isChangePassword: true }, auth.getUser?.id!)
-    .then((data) => {
+    .updateUser({ ...value, isChangePassword: true })
+    .then(async (data) => {
       toast.success(data?.message, {
         position: 'top-right',
       });
-      switch (true) {
-        case auth.getUser?.role.name.startsWith('IT'):
-          router?.replace('users-list');
-          isLoading.value = false;
-          break;
-
-        case auth.getUser?.role.name.startsWith('FLEET'):
-          router?.replace('fleets-list');
-          isLoading.value = false;
-          break;
-
-        default:
-          break;
-      }
+      await auth.session();
+      router.replace(redirectByRole());
     })
     .catch((error) => {
-      isLoading.value = false;
       toast.error(error?.message, {
         position: 'top-right',
       });
+    })
+    .finally(() => {
+      isLoading.value = false;
     });
 };
 </script>

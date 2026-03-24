@@ -1,4 +1,15 @@
 <script lang="ts" setup>
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -7,20 +18,10 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
 import { MoreHorizontal } from 'lucide-vue-next';
 import { useRouter } from 'vue-router';
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     data: any;
     url?: string;
@@ -28,13 +29,31 @@ withDefaults(
     url_detail?: string;
     detail: boolean;
     handleDelete?: () => void;
+    onViewUpdate?: () => void;
   }>(),
   {
     url_update: true,
-  },
+  }
 );
 
+const emit = defineEmits<{
+  (e: 'viewUpdate'): void;
+}>();
+
 const router = useRouter();
+
+const handleViewUpdate = () => {
+  if (props.onViewUpdate) {
+    props.onViewUpdate();
+  } else if (props.url) {
+    router.push({
+      path: props.url,
+      state: {
+        data: JSON.stringify(props.data),
+      },
+    });
+  }
+};
 </script>
 
 <template>
@@ -42,7 +61,7 @@ const router = useRouter();
     <DropdownMenu>
       <DropdownMenuTrigger as-child>
         <Button class="w-8 h-8 p-0" variant="ghost">
-          <span class="sr-only">Open menu</span>
+          <span class="sr-only">Ouvrir le menu</span>
           <MoreHorizontal class="w-4 h-4" />
         </Button>
       </DropdownMenuTrigger>
@@ -51,16 +70,8 @@ const router = useRouter();
         <DropdownMenuItem
           v-if="url_update"
           class="cursor-pointer"
-          @click="
-            () =>
-              router.push({
-                path: url,
-                state: {
-                  data: JSON.stringify(data),
-                },
-              })
-          "
-          >View Update
+          @click="handleViewUpdate"
+          >Modifier
         </DropdownMenuItem>
         <DropdownMenuItem
           v-if="detail"
@@ -74,7 +85,7 @@ const router = useRouter();
                 },
               })
           "
-          >View vehicle details
+          >Voir les détails
         </DropdownMenuItem>
 
         <AlertDialogTrigger as-child>
@@ -84,11 +95,14 @@ const router = useRouter();
     </DropdownMenu>
     <AlertDialogContent>
       <AlertDialogHeader>
-        <AlertDialogTitle>Etre vous sur de supprimer cette donner ?</AlertDialogTitle>
+        <AlertDialogTitle>Êtes-vous sûr de vouloir supprimer ?</AlertDialogTitle>
+        <AlertDialogDescription>
+          Cette action est irréversible. L'élément sera définitivement supprimé.
+        </AlertDialogDescription>
       </AlertDialogHeader>
       <AlertDialogFooter>
-        <AlertDialogCancel>Non</AlertDialogCancel>
-        <AlertDialogAction @click="handleDelete">Oui</AlertDialogAction>
+        <AlertDialogCancel>Annuler</AlertDialogCancel>
+        <AlertDialogAction @click="handleDelete">Confirmer</AlertDialogAction>
       </AlertDialogFooter>
     </AlertDialogContent>
   </AlertDialog>

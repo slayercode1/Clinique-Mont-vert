@@ -6,7 +6,7 @@ import {
   type CalendarRootProps,
   useForwardPropsEmits,
 } from 'radix-vue';
-import { computed, type HTMLAttributes } from 'vue';
+import { type HTMLAttributes, computed } from 'vue';
 import {
   CalendarCell,
   CalendarCellTrigger,

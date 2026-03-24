@@ -1,3 +1,4 @@
+import compression from 'compression';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
@@ -5,7 +6,7 @@ import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import { proxy } from './middlewares/proxy/proxy.js';
 
-dotenv.config();
+dotenv.config({ quiet: true });
 
 const gateway = express();
 const port = process.env.PORT_GATEWAY;
@@ -24,14 +25,15 @@ gateway.use(
     methods: ['GET', 'POST', 'PATCH', 'DELETE'],
   })
 );
-gateway.set('trust proxy', 'loopback, linklocal, uniquelocal');
+gateway.set('trust proxy', 'loopback');
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   limit: 100,
   message: 'Too many requests from this IP, please try again later.',
 });
 gateway.use(limiter);
-gateway.use(express.json());
+gateway.use(express.json({ limit: '1mb' }));
+gateway.use(compression());
 
 gateway.use('/:service', proxy);
 
