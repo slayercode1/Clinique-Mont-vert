@@ -7,6 +7,7 @@ export const createResourceSchema = z.object({
   purchase_date: z.string().max(50),
   supplier: z.string().min(1).max(200),
   expired_at: z.string().max(50),
+  state: z.enum(['IN_USE', 'IN_REPAIR', 'OUT_OF_SERVICE']).optional(),
 });
 
 export const resourceSchema = z.object({

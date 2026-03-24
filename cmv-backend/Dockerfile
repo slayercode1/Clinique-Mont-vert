@@ -9,7 +9,7 @@ COPY package*.json ./
 RUN npm install
 
 COPY . .
-RUN npm run build && npx prisma generate
+RUN npx prisma generate && npm run build
 
 # ── Production stage ───────────────────────────────────────────────────────────
 FROM node:${NODE_VERSION} AS production
