@@ -18,6 +18,7 @@ async function createRoles() {
       { name: 'FLEET_ADMIN' },
       { name: 'SuperAdmin' },
     ],
+    skipDuplicates: true,
   });
   return await prisma.role.findMany();
 }
@@ -75,7 +76,8 @@ async function createServices() {
   ];
   const services = [];
   for (const name of serviceNames) {
-    const s = await prisma.service.create({ data: { name } });
+    let s = await prisma.service.findFirst({ where: { name } });
+    if (!s) s = await prisma.service.create({ data: { name } });
     services.push(s);
   }
   return services;
@@ -97,7 +99,7 @@ async function main() {
     roleId: superAdminRole.id,
     permissionId: permission.id,
   }));
-  await prisma.permissionOnRole.createMany({ data: permissionOnRolesData });
+  await prisma.permissionOnRole.createMany({ data: permissionOnRolesData, skipDuplicates: true });
 
   // Services
   const services = await createServices();
@@ -110,7 +112,8 @@ async function main() {
   const sChirurgie = services[6];
   const sRadio = services[7];
 
-  const pwd = await bcrypt.hash('Password123!', 10);
+  const defaultPassword = process.env.SEED_PASSWORD || 'Password123!';
+  const pwd = await bcrypt.hash(defaultPassword, 10);
 
   // Utilisateurs
   const usersData = [
@@ -195,9 +198,12 @@ async function main() {
 
   const users = [];
   for (const u of usersData) {
-    const user = await prisma.user.create({
-      data: { ...u, password: pwd, status: 'ACTIF', isChangePassword: false },
-    });
+    let user = await prisma.user.findFirst({ where: { email: u.email } });
+    if (!user) {
+      user = await prisma.user.create({
+        data: { ...u, password: pwd, status: 'ACTIF', isChangePassword: false },
+      });
+    }
     users.push(user);
   }
 
@@ -323,7 +329,8 @@ async function main() {
 
   const materials = [];
   for (const m of materialsData) {
-    const mat = await prisma.material.create({ data: m });
+    let mat = await prisma.material.findFirst({ where: { resource: m.resource } });
+    if (!mat) mat = await prisma.material.create({ data: m });
     materials.push(mat);
   }
 
@@ -431,8 +438,11 @@ async function main() {
     },
   ];
 
-  for (const t of ticketsData) {
-    await prisma.ticket.create({ data: t });
+  const existingTickets = await prisma.ticket.count();
+  if (existingTickets === 0) {
+    for (const t of ticketsData) {
+      await prisma.ticket.create({ data: t });
+    }
   }
 
   // Associer du matériel à certains tickets
@@ -648,7 +658,8 @@ async function main() {
 
   const vehicles = [];
   for (const v of vehiclesData) {
-    const vehicle = await prisma.vehicle.create({ data: v });
+    let vehicle = await prisma.vehicle.findFirst({ where: { brand: v.brand, model: v.model } });
+    if (!vehicle) vehicle = await prisma.vehicle.create({ data: v });
     vehicles.push(vehicle);
   }
 
@@ -716,15 +727,18 @@ async function main() {
     },
   ];
 
-  for (const c of costsData) {
-    await prisma.cost.create({ data: c });
+  const existingCosts = await prisma.cost.count();
+  if (existingCosts === 0) {
+    for (const c of costsData) {
+      await prisma.cost.create({ data: c });
+    }
   }
 
   console.log('Seed de démo terminé avec succès !');
   console.log('---');
-  console.log('Compte admin : admin@cmv.re / Password123!');
-  console.log('Compte IT admin : marie.riviere@cmv.re / Password123!');
-  console.log('Tous les mots de passe : Password123!');
+  console.log(`Compte admin : admin@cmv.re / ${defaultPassword}`);
+  console.log(`Compte IT admin : marie.riviere@cmv.re / ${defaultPassword}`);
+  console.log(`Tous les mots de passe : ${defaultPassword}`);
 }
 
 main()

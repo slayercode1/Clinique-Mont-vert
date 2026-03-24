@@ -29,6 +29,7 @@ services:
     restart: unless-stopped
 
   server:
+    image: ghcr.io/slayercode1/clinique-mont-vert/backend:latest
     build:
       context: ./cmv-backend
     env_file:
@@ -38,16 +39,6 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-    networks:
-      - app-net
-      - caddy-net
-    restart: unless-stopped
-
-  web:
-    build:
-      context: ./cmv-web
-    depends_on:
-      - server
     networks:
       - app-net
       - caddy-net
