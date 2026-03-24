@@ -85,8 +85,8 @@ export const createUser = async (request: Request, response: Response): Promise<
         email: body.email,
         password: passwordHash,
         status: body.status,
-        roleId: role?.id,
-        serviceId: service?.id,
+        roleId: role?.id ?? body.roleId,
+        serviceId: service?.id ?? body.serviceId,
       },
     });
 

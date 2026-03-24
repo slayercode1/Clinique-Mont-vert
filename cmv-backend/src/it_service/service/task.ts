@@ -145,12 +145,14 @@ export const updateTicket = async (request: Request, response: Response): Promis
             include: { employee: true, resolvedBy: true, material: true },
           })
           .then((data) => {
-            sendemail(
-              'client-task-approval-status.edge',
-              data,
-              data.resolvedBy?.email,
-              'Statut de la tâche - Validée par le client'
-            );
+            if (data.resolvedBy?.email) {
+              sendemail(
+                'client-task-approval-status.edge',
+                data,
+                data.resolvedBy.email,
+                'Statut de la tâche - Validée par le client'
+              );
+            }
             return response.status(200).json({ success: true, data });
           });
 
@@ -169,12 +171,14 @@ export const updateTicket = async (request: Request, response: Response): Promis
             include: { employee: true, resolvedBy: true, material: true },
           })
           .then((data) => {
-            sendemail(
-              'client-task-approval-status.edge',
-              data,
-              data.resolvedBy?.email,
-              'Statut de la tâche - Refusée par le client'
-            );
+            if (data.resolvedBy?.email) {
+              sendemail(
+                'client-task-approval-status.edge',
+                data,
+                data.resolvedBy.email,
+                'Statut de la tâche - Refusée par le client'
+              );
+            }
             return response.status(200).json({ success: true, data });
           });
 
