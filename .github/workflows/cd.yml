@@ -171,17 +171,9 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           envs: ENV_FILE,GH_TOKEN,GH_USER
           script: |
-            # Debug: voir la structure copiée
-            echo "=== Structure /tmp/clinique-deploy ==="
-            find /tmp/clinique-deploy/ -type f | head -30
-
             # Deploy frontend static files
-            rm -rf /var/html/clinique/*
-            cp -r /tmp/clinique-deploy/frontend-dist/* /var/html/clinique/
-
-            # Vérification
-            echo "=== Fichiers déployés ==="
-            ls -la /var/html/clinique/
+            sudo rm -rf /var/html/clinique/*
+            sudo cp -r /tmp/clinique-deploy/frontend-dist/* /var/html/clinique/
 
             # Deploy backend
             cd /var/html/clinique-monvert
