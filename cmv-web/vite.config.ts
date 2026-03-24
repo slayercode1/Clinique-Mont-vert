@@ -40,8 +40,8 @@ export default defineConfig({
     port: 5173,
     host: true,
     proxy: {
-      '/it': 'http://localhost:3000',
-      '/fleet': 'http://localhost:3000',
+      '/it/': 'http://localhost:3000',
+      '/fleet/': 'http://localhost:3000',
     },
   },
   test: {

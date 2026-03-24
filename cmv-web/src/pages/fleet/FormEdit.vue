@@ -19,12 +19,30 @@ const form = useForm({
 });
 onMounted(async () => {
   await vehicle.fetchFleet(route.params.id as string);
-  form.setFieldValue('brand', vehicle.getFleet?.brand);
-  form.setFieldValue('state', vehicle.getFleet?.state);
-  form.setFieldValue('kilometres', vehicle.getFleet?.kilometres);
-  form.setFieldValue('model', vehicle.getFleet?.model);
-  form.setFieldValue('year', vehicle.getFleet?.year);
-  form.setFieldValue('maintenance_date', vehicle.getFleet?.maintenance_date);
+  const f = vehicle.getFleet;
+  if (!f) return;
+  form.setFieldValue('brand', f.brand);
+  form.setFieldValue('state', f.state);
+  form.setFieldValue('kilometres', f.kilometres);
+  form.setFieldValue('model', f.model);
+  form.setFieldValue('year', f.year);
+  form.setFieldValue('maintenance_date', f.maintenance_date);
+  form.setFieldValue('date_circulation', f.date_circulation);
+  form.setFieldValue('carburant', f.carburant);
+  form.setFieldValue('usage', f.usage);
+  form.setFieldValue('km_moyen_annuel', f.km_moyen_annuel);
+  form.setFieldValue('km_derniere_revision', f.km_derniere_revision);
+  form.setFieldValue('jours_depuis_derniere_revision', f.jours_depuis_derniere_revision);
+  form.setFieldValue('km_depuis_derniere_revision', f.km_depuis_derniere_revision);
+  form.setFieldValue('nb_revisions_effectuees', f.nb_revisions_effectuees);
+  form.setFieldValue('intervalle_recommande_jours', f.intervalle_recommande_jours);
+  form.setFieldValue('intervalle_recommande_km', f.intervalle_recommande_km);
+  form.setFieldValue('condition_vehicule', f.condition_vehicule);
+  form.setFieldValue('nb_pannes_historique', f.nb_pannes_historique);
+  form.setFieldValue('age_vehicule', f.age_vehicule);
+  form.setFieldValue('taux_utilisation_km', f.taux_utilisation_km);
+  form.setFieldValue('taux_utilisation_jours', f.taux_utilisation_jours);
+  form.setFieldValue('revisions_par_an', f.revisions_par_an);
 });
 
 const updateVehicle = (values: any) => {

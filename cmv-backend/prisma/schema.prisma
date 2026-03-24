@@ -151,15 +151,37 @@ model PermissionOnRole {
 }
 
 model Vehicle {
-  id               String       @id @default(cuid())
-  brand            String
-  model            String
-  year             Int
-  state            StateVehicle @default(IN_USE)
-  maintenance_date DateTime     @db.Date
-  kilometres       String
-  deleted          Boolean      @default(false)
-  Cost             Cost[]
+  id                             String       @id @default(cuid())
+  brand                          String
+  model                          String
+  year                           Int
+  state                          StateVehicle @default(IN_USE)
+  maintenance_date               DateTime     @db.Date
+  kilometres                     String
+  deleted                        Boolean      @default(false)
+  date_circulation               DateTime?    @db.Date
+  carburant                      String?
+  usage                          String?
+  km_moyen_annuel                Float?
+  km_derniere_revision           Float?
+  jours_depuis_derniere_revision Int?
+  km_depuis_derniere_revision    Float?
+  nb_revisions_effectuees        Int?
+  intervalle_recommande_jours    Int?
+  intervalle_recommande_km       Float?
+  condition_vehicule             Int?
+  nb_pannes_historique           Int?
+  age_vehicule                   Int?
+  taux_utilisation_km            Float?
+  taux_utilisation_jours         Float?
+  revisions_par_an               Float?
+  prediction_estimation_jours    Float?
+  prediction_estimation_mois     Float?
+  prediction_fourchette_min_mois Float?
+  prediction_fourchette_max_mois Float?
+  prediction_recommandation      String?
+  prediction_date                DateTime?
+  Cost                           Cost[]
 
   @@schema("cmv-fleet")
 }

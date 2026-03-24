@@ -9,6 +9,15 @@ export const fleetStore = defineStore('fleet', {
       fleets: [] as VehicleType[] & { id?: string },
       costs: [] as CostType[],
       fleet: undefined as VehicleType | undefined,
+      prediction: null as {
+        estimation_jours: number;
+        estimation_mois: number;
+        fourchette_min_mois: number;
+        fourchette_max_mois: number;
+        recommandation: string;
+      } | null,
+      predictionLoading: false,
+      predictionError: null as string | null,
     };
   },
   getters: {
@@ -82,6 +91,27 @@ export const fleetStore = defineStore('fleet', {
         this.costs = this.costs.filter(
           (cost: CostType) => (cost as CostType & { id?: string }).id !== id
         );
+      }
+    },
+
+    async fetchPrediction(id: string) {
+      this.predictionLoading = true;
+      this.predictionError = null;
+      this.prediction = null;
+      try {
+        const response = await authFetch(`${API_ENDPOINT}/fleet/predict/${id}`, {
+          method: 'POST',
+        });
+        const result = await response.json();
+        if (!response.ok) {
+          this.predictionError = result.message || 'Erreur lors de la prédiction';
+          return;
+        }
+        this.prediction = result.data;
+      } catch {
+        this.predictionError = 'Service de prédiction indisponible';
+      } finally {
+        this.predictionLoading = false;
       }
     },
 
