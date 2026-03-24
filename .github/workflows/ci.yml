@@ -46,12 +46,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
-          cache-dependency-path: cmv-backend/package-lock.json
 
       - name: Install dependencies
         working-directory: cmv-backend
-        run: npm ci
+        run: npm install
 
       - name: Create schemas and run migrations
         working-directory: cmv-backend
@@ -77,8 +75,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
-          cache-dependency-path: cmv-web/package.json
 
       - name: Install dependencies
         working-directory: cmv-web
