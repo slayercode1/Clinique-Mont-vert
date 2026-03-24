@@ -55,7 +55,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: cmv-backend
-        run: npm install
+        run: npm install --legacy-peer-deps
 
       - name: Create schemas and run migrations
         working-directory: cmv-backend
